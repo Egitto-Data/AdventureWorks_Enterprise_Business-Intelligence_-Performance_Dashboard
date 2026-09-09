@@ -42,6 +42,14 @@ The data model connects two main Fact tables (`Sales Data` and `Returns Data`) t
 
 ---
 
+## Data Dictionary & Defined Tables
+
+*(Place a screenshot or exported visual of your defined tables and data dictionary here)*
+
+![Defined Tables Image Placeholder](path/to/your/defined_tables_image.png)
+
+---
+
 ## Business Metrics & DAX Measures Breakdown
 
 Below is a detailed guide to all DAX measures built into the model, their technical definitions, and how they solve business problems:
@@ -157,9 +165,10 @@ Below is a detailed guide to all DAX measures built into the model, their techni
 ## Instructions for Including Images in This README
 
 1. **Create an Image Folder:** Create an `assets/` or `images/` directory inside your GitHub repository root.
-2. **Save Screenshots:** Save your Power BI dashboard screenshots in PNG or JPG format (e.g., `data_model.png`, `exec_dashboard.png`, `map_view.png`, `product_details.png`, `customer_details.png`).
+2. **Save Screenshots:** Save your Power BI dashboard screenshots in PNG or JPG format (e.g., `data_model.png`, `defined_tables.png`, `exec_dashboard.png`, `map_view.png`, `product_details.png`, `customer_details.png`).
 3. **Upload & Link:** Move the files into the folder and update the image placeholder paths in this README file accordingly:
    * **Data Model:** Place link in **Data Model Diagram** section.
+   * **Defined Tables:** Place link in **Data Dictionary & Defined Tables** section.
    * **Exec Dashboard:** Place link in **Executive Dashboard** section.
    * **Map:** Place link in **Regional Sales & Map Analysis** section.
    * **Product Details:** Place link in **Product Performance Details** section.
