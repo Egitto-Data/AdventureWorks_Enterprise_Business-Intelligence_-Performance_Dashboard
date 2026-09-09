@@ -43,9 +43,8 @@ The data model connects two main Fact tables (`Sales Data` and `Returns Data`) t
 
 ## Data Dictionary & Defined Tables
 
-*(Place a screenshot or exported visual of your defined tables and data dictionary here)*
 
-![Defined Tables Image Placeholder](path/to/your/defined_tables_image.png)
+![Defined Tables](assets/User_DefinedTables.PNG)
 
 ---
 
@@ -126,49 +125,33 @@ Below is a detailed guide to all DAX measures built into the model, their techni
 ## Executive & Visual Dashboards
 
 ### 1. Executive Dashboard
-*(Place your Executive Dashboard screenshot here)*  
-* **Where to include in README:** Under this subsection.  
-* **Description:** Provides C-suite executives with a macro view of key metrics including Total Revenue, Total Profit, Return Rates, Month-over-Month Target Gauges, and high-level trend charts.
+ 
+ * **Description:** Provides C-suite executives with a macro view of key metrics including Total Revenue, Total Profit, Return Rates, Month-over-Month Target Gauges, and high-level trend charts.
 
-![Exec Dashboard Placeholder](path/to/your/exec_dashboard_image.png)
+![Exec Dashboard Placeholder](assets/Exec_Dashoard.PNG)
 
 ---
 
 ### 2. Regional Sales & Map Analysis
-*(Place your Regional Map Dashboard screenshot here)*  
-* **Where to include in README:** Under this subsection.  
+
 * **Description:** Visualizes geographic sales distributions across continents, countries, and regions using map visualizations to highlight geographic sales concentrations and underperforming territories.
 
-![Map Dashboard Placeholder](path/to/your/map_image.png)
+![Map Dashboard](assets/Map.PNG)
 
 ---
 
 ### 3. Product Performance Details
-*(Place your Product Detail Dashboard screenshot here)*  
-* **Where to include in README:** Under this subsection.  
+
 * **Description:** Itemizes product performance by Category, Subcategory, and SKU. Integrates return rate metrics and price adjustment scenario sliders.
 
-![Product Details Placeholder](path/to/your/product_details_image.png)
+![Product Details](assets/Product_Detail.PNG)
 
 ---
 
 ### 4. Customer Demographics & Segmentation Details
-*(Place your Customer Detail Dashboard screenshot here)*  
-* **Where to include in README:** Under this subsection.  
+  
 * **Description:** Breaks down customer cohorts by income levels, occupation, education, and parenting status, highlighting top individual spenders and customer lifecycle values.
 
-![Customer Detail Placeholder](path/to/your/customer_detail_image.png)
+![Customer Detail](assets/Customer_Detail.PNG)
 
 ---
-
-## Instructions for Including Images in This README
-
-1. **Create an Image Folder:** Create an `assets/` or `images/` directory inside your GitHub repository root.
-2. **Save Screenshots:** Save your Power BI dashboard screenshots in PNG or JPG format (e.g., `data_model.png`, `defined_tables.png`, `exec_dashboard.png`, `map_view.png`, `product_details.png`, `customer_details.png`).
-3. **Upload & Link:** Move the files into the folder and update the image placeholder paths in this README file accordingly:
-   * **Data Model:** Place link in **Data Model Diagram** section.
-   * **Defined Tables:** Place link in **Data Dictionary & Defined Tables** section.
-   * **Exec Dashboard:** Place link in **Executive Dashboard** section.
-   * **Map:** Place link in **Regional Sales & Map Analysis** section.
-   * **Product Details:** Place link in **Product Performance Details** section.
-   * **Customer Detail:** Place link in **Customer Demographics & Segmentation Details** section.
