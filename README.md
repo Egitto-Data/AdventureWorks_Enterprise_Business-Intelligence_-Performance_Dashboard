@@ -36,9 +36,8 @@ The data model connects two main Fact tables (`Sales Data` and `Returns Data`) t
 ---
 
 ## Data Model Diagram
-*(Place your Power BI data model relationship screenshot here)*
 
-![Data Model Image Placeholder](path/to/your/data_model_image.png)
+![Data Model](assets/Data_Model.PNG)
 
 ---
 
