@@ -1,0 +1,2347 @@
+createOrReplace
+
+	table 'Measure Table'
+		lineageTag: a55f914a-fd36-4eb8-94bb-8a12b836185e
+
+		measure 'Quantity Returned' =
+				
+				SUM(
+				    'Returns Data'[ReturnQuantity]
+				)
+			formatString: #,0
+			lineageTag: 3e428102-631c-4c1f-b34c-b7153f3890dd
+
+			changedProperty = IsHidden
+
+		measure 'Quantity Sold' =
+				
+				SUM(
+				    'Sales Data'[OrderQuantity]
+				)
+			formatString: #,0
+			lineageTag: 29355ebf-e740-4e58-824d-d0b55739efab
+
+		measure 'Average Retail Price' =
+				
+				AVERAGE(
+				    'Product Lookup'[ProductPrice]
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			lineageTag: be2a874f-9e90-4a6c-9a1d-5f7d5f48a576
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Total Returns' =
+				
+				COUNTROWS(
+				    'Returns Data'
+				)
+			formatString: #,0
+			lineageTag: 01efe1b8-3fc3-467f-8a4b-b94e7a885777
+
+		measure 'Total Orders' =
+				
+				DISTINCTCOUNT(
+				    'Sales Data'[OrderNumber]
+				)
+			formatString: #,0
+			lineageTag: 3042ed45-e9cd-4cd6-8801-464e7bf79e0f
+
+		measure 'Total Customers' =
+				
+				DISTINCTCOUNT(
+				    'Sales Data'[CustomerKey]
+				)
+			formatString: #,0
+			lineageTag: c10c5ee3-bceb-4ebc-9059-fc32e833248c
+
+		measure 'Return Rate' =
+				
+				DIVIDE(
+				    [Quantity Returned],
+				    [Quantity Sold],
+				    "No Sales"
+				)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 731f9865-8bd7-4c89-aca4-c1bee49d4d54
+
+		measure 'Bulk Orders' = ```
+				
+				CALCULATE(
+				    [Total Orders],
+				    'Sales Data'[OrderQuantity] > 1
+				)
+				
+				```
+			formatString: #,0
+			lineageTag: ee87721b-d95e-4a60-857a-37bb47afabc0
+
+		measure 'Weekend Orders' =
+				
+				CALCULATE(
+				    [Total Orders],
+				    'Calendar Lookup'[Weekend] = "weekend"
+				)
+			formatString: #,0
+			lineageTag: 7628269f-034d-4183-8f5e-a9ca76015fca
+
+		measure 'Bike Returns' =
+				
+				CALCULATE(
+				    [Total Returns],
+				    'Product Categories Lookup'[CategoryName] = "Bikes"
+				)
+			formatString: #,0
+			lineageTag: 546963ed-7295-4a7a-aba0-636585515202
+
+		measure 'Bike Sales' =
+				
+				CALCULATE(
+				    [Quantity Sold],
+				    'Product Categories Lookup'[CategoryName] = "Bikes"
+				)
+			formatString: 0
+			lineageTag: e871e8ca-cce8-4c2e-9685-02fb3a85c890
+
+		measure 'Bike Return Rate' =
+				
+				CALCULATE(
+				    [Return Rate],
+				    'Product Categories Lookup'[CategoryName] = "Bikes"
+				)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: 75cb6869-954d-4c3c-8ad3-495276585f56
+
+		measure 'All Orders' =
+				
+				CALCULATE(
+				    [Total Orders],
+				    ALL(
+				        'Sales Data'
+				    )
+				)
+			formatString: #,0
+			lineageTag: 18703c28-144f-4ccb-b483-6dbc8efaa5c1
+
+		measure '% Of All Orders' =
+				
+				DIVIDE(
+				    [Total Orders],
+				    [All Orders]
+				)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: b59634d8-8a0c-4c24-8400-f25fe84abad0
+
+		measure 'Overall Average Price' =
+				
+				CALCULATE(
+				    [Average Retail Price],
+				    ALL(
+				        'Product Lookup'
+				    )
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			lineageTag: 3f1f4fd7-6dc0-4ffe-8b88-6b198bf3dcdd
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'All Returns' =
+				
+				CALCULATE(
+				    [Total Returns],
+				    ALL(
+				        'Returns Data'
+				    )
+				)
+			lineageTag: 99724a79-ecd7-47c0-81e7-92471081ea57
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure '% of All Returns' =
+				
+				DIVIDE(
+				    [Total Returns],
+				    [All Returns]
+				)
+			formatString: 0.00%;-0.00%;0.00%
+			lineageTag: f3dc493f-ecdd-4a46-8a5c-e8a864938020
+
+		measure 'Total Revenue' = ```
+				
+				SUMX(
+				    'Sales Data',
+				    'Sales Data'[OrderQuantity] * 
+				    RELATED(
+				        'Product Lookup'[ProductPrice]
+				    )
+				)
+				
+				```
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: c7f5ce44-16d4-4bbd-8b82-61199e0d1418
+
+		measure 'Average Revenue Per Customer' =
+				
+				DIVIDE(
+				    [Total Revenue],
+				    [Total Customers]
+				)
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: 7a85f306-a4c1-4b24-a62f-8a6c34e2028f
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Total Cost' = ```
+				
+				SUMX(
+				    'Sales Data',
+				    'Sales Data'[OrderQuantity] 
+				    *
+				    RELATED(
+				        'Product Lookup'[ProductCost]
+				    )
+				)
+				```
+			formatString: #,0
+			lineageTag: 079e35a4-e3b2-4193-9705-a7f6edf12c63
+
+			annotation PBI_FormatHint = {"isDecimal":true}
+
+		measure 'Total Profit' = ```
+				
+				[Total Revenue] - [Total Cost]
+				
+				```
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: 9401d8c2-4807-4ce5-820e-e2ec71657778
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'YTD Revenue' =
+				
+				CALCULATE(
+				    [Total Revenue],
+				    DATESYTD('Calendar Lookup'[Date]
+				    )
+				)
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: 14a53ddf-3bb8-450a-8973-cf452fbb59bc
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Previous Month Revenue' =
+				
+				CALCULATE(
+				    [Total Revenue],
+				    DATEADD('Calendar Lookup'[Date],
+				    -1,
+				    MONTH
+				    )
+				)
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: 6a21c730-0c7e-4166-9c84-6c45c6b35342
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Revenue Target' =
+				
+				[Previous Month Revenue] * 1.1
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: cc96c0bf-014c-490d-8417-afcf2cc53654
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure '10-day Rolling Revenue' =
+				
+				CALCULATE(
+				    [Total Revenue],
+				    DATESINPERIOD(
+				        'Calendar Lookup'[Date],
+				        MAX(
+				            'Calendar Lookup'[Date]
+				        ),
+				        -10,
+				        DAY
+				    )
+				)
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: c34144e8-0dc4-446d-82d9-b468c9e5c174
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Previous Month Orders' =
+				
+				CALCULATE(
+				    [Total Orders],
+				    DATEADD('Calendar Lookup'[Date],
+				    -1
+				    ,MONTH
+				    )
+				)
+			formatString: #,0
+			lineageTag: 1427a952-a33e-40cd-9cd9-5f8b20b86b5b
+
+		measure 'Previous Month Returns' =
+				
+				CALCULATE(
+				    [Total Returns],
+				    DATEADD(
+				        'Calendar Lookup'[Date],
+				        -1,
+				        MONTH
+				    )
+				)
+			formatString: #,0
+			lineageTag: a61263e9-25fa-4f24-91b0-7bd96676adbe
+
+		measure 'Previous Month Profit' =
+				
+				CALCULATE(
+				    [Total Profit],
+				    DATEADD('Calendar Lookup'[Date],
+				    -1,
+				    MONTH
+				    )
+				)
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: 68c85b01-7b92-4091-95c5-ed81cac76502
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Order Target' =
+				
+				[Previous Month Orders] * 1.1
+			formatString: #,0
+			lineageTag: deed5a2c-d1d4-414c-baf1-50ee48548817
+
+		measure 'Profit Target' =
+				
+				[Previous Month Profit] * 1.1
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: 7ce465af-7e10-4e2a-acae-143595a71d84
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Total Orders (Customer Detail)' =
+				
+				IF(
+				    HASONEVALUE(
+				        'Customer Lookup'[CustomerKey]
+				    ),
+				    [Total Orders],
+				    "-"
+				)
+			lineageTag: a96e2fc7-d657-4ce1-8843-b2a35013185f
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Total Revenue (Customer Detail)' =
+				
+				IF(
+				    HASONEVALUE(
+				        'Customer Lookup'[CustomerKey]
+				    ),
+				    [Total Revenue],
+				    "-"
+				)
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			lineageTag: 0e5db3b7-d9cc-4dca-9028-c349ff49dbbe
+
+		measure 'Full Name (Customer Detail)' =
+				
+				IF(
+				    HASONEVALUE(
+				        'Customer Lookup'[CustomerKey]
+				    ),
+				    MAX(
+				        'Customer Lookup'[Full Name]
+				    ),
+				    "Multiple Customers"
+				)
+			lineageTag: fea480aa-2621-45fd-99b9-68124d64f74d
+
+		measure 'Order Target Gap' =
+				
+				[Total Orders] - [Order Target]
+			lineageTag: 31d3567b-fabf-4173-b3d2-9065dbe3f037
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		measure 'Revenue Target Gap' =
+				
+				[Total Revenue] - [Revenue Target]
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			lineageTag: 8caeeeac-b8ca-4e56-9c75-b67fbd3407e8
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Profit Target Gap' =
+				
+				[Total Profit] - [Profit Target]
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			lineageTag: 91806ed8-e957-4b89-9147-fc72a2ef8e3d
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Revenue KPI Card SVG' =
+				
+				VAR CurrentVal = [Total Revenue]
+				VAR PreviousVal = [Previous Month Revenue]
+				VAR PctOfPM = DIVIDE(CurrentVal, PreviousVal, 0)
+				VAR GaugePct = MIN(1.0, MAX(0.0, PctOfPM))
+				
+				-- Performance Status (Good = Green Gradient, Bad = Red Gradient)
+				VAR IsGood = CurrentVal >= PreviousVal
+				VAR GradStart = IF(IsGood, "%23059669", "%23DC2626")
+				VAR GradEnd   = IF(IsGood, "%2310B981", "%23EF4444")
+				VAR GradID    = "gradRev"
+				
+				-- Gauge mask calculations (Bar length = 180px, starting at X=20)
+				VAR FillWidth = INT(180 * GaugePct)
+				VAR MaskWidth = 180 - FillWidth
+				VAR MaskX     = 20 + FillWidth
+				
+				RETURN
+				"data:image/svg+xml;utf8," &
+				"<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 130' overflow='visible'>" &
+				
+				  "<defs>" &
+				    "-- Card Drop Shadow --" &
+				    "<filter id='cardShadow' x='-10%' y='-10%' width='130%' height='130%'>" &
+				      "<feDropShadow dx='1' dy='2' stdDeviation='3' flood-color='%23000000' flood-opacity='0.12'/>" &
+				    "</filter>" &
+				
+				    "-- Blue to Cyan Bar Fill Gradient --" &
+				    "<linearGradient id='barLinear' x1='0%' y1='0%' x2='100%' y2='0%'>" &
+				      "<stop offset='0%' stop-color='%230284c7'/>" &
+				      "<stop offset='100%' stop-color='%2338bdf8'/>" &
+				    "</linearGradient>" &
+				
+				    "-- KPI Text Dynamic Scale Gradient --" &
+				    "<linearGradient id='" & GradID & "' x1='0%' y1='0%' x2='100%' y2='0%'>" &
+				      "<stop offset='0%' stop-color='" & GradStart & "'/>" &
+				      "<stop offset='100%' stop-color='" & GradEnd & "'/>" &
+				    "</linearGradient>" &
+				
+				    "<clipPath id='clip-rev'>" &
+				      "<rect x='" & MaskX & "' y='85' width='" & MaskWidth & "' height='18' />" &
+				    "</clipPath>" &
+				  "</defs>" &
+				
+				  "-- Card Background Outline --" &
+				  "<rect x='6' y='6' rx='6' ry='6' width='228' height='118' fill='white' stroke='%23E5E7EB' stroke-width='1' filter='url(#cardShadow)'/>" &
+				
+				  "-- Title --" &
+				  "<text text-anchor='start' font-size='11pt' font-family='Segoe UI, sans-serif' x='18' y='28' fill='#1F2937'>Monthly Revenue</text>" &
+				
+				  "-- Main KPI Value with Gradient Fill --" &
+				  "<text text-anchor='start' font-weight='bold' font-size='24pt' font-family='Segoe UI, sans-serif' x='18' y='68' fill='url(#" & GradID & ")'>" & FORMAT(CurrentVal, "$#,##0") & "</text>" &
+				
+				  "-- Last Month Box --" &
+				  "<rect x='118' y='42' rx='3' ry='3' width='102' height='28' fill='%23EEF2FF'></rect>" &
+				  "<text text-anchor='start' font-size='9pt' font-family='Segoe UI, sans-serif' x='125' y='60' fill='#1F2937'>Last Month: " & FORMAT(PreviousVal, "$#,##0") & "</text>" &
+				
+				  "-- Progress Bar Track & Fill --" &
+				  "<rect id='track' x='20' y='85' rx='9' ry='9' width='180' height='18' fill='%23D1D5DB'></rect>" &
+				  "<rect id='fill' x='20' y='85' rx='9' ry='9' width='180' height='18' fill='url(#barLinear)'></rect>" &
+				  "<rect id='mask' x='20' y='85' rx='9' ry='9' width='180' height='18' fill='%23D1D5DB' clip-path='url(#clip-rev)'></rect>" &
+				
+				"</svg>"
+			lineageTag: 19027b21-bd8c-4cda-b4b7-0e9e0be30867
+
+		measure 'Adjusted Price' = [Average Retail Price] * (1 + 'Price Adjustment (%)'[Price Adjustment (%) Value])
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			lineageTag: d88bd1ce-4e2a-458a-ac6a-bb6b91546c7e
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Adjusted Revenue' = ```
+				
+				SUMX(
+				    'Sales Data',
+				    'Sales Data'[OrderQuantity] * 
+				  [Adjusted Price]
+				    )
+				
+				```
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			lineageTag: b8839bee-9f44-4922-be67-77ed65252304
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure 'Adjusted Profit' =
+				
+				[Adjusted Revenue] - [Total Cost]
+			formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+			lineageTag: 9e56e9e3-8bce-4054-89b8-a99eea7c0055
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		measure Measure
+			lineageTag: 5faa064f-ff70-4c00-a953-4f5aea79d173
+
+			annotation 43dbc3e8-3a1c-4b6f-9923-b49ff7d6691c = True
+
+		measure 'New Customers' =
+				
+				CALCULATE(
+				    [Total Customers],
+				    'Sales Data'[Months Since First Transaction] = 0
+				)
+			formatString: #,0
+			lineageTag: 6f48c1f0-aa77-4b24-8c00-8cc1da28a9a9
+
+		measure 'Cohort Performance' =
+				
+				var mindate = MIN('Calendar Lookup'[Start of Month])
+				var maxdate = MAX('Calendar Lookup'[Start of Month])
+				RETURN
+				CALCULATE(
+				    [Total Customers],
+				    REMOVEFILTERS('Calendar Lookup'[Start of Month]),
+				    RELATEDTABLE('Customers Cohort'),
+				    'Customers Cohort'[First Transaction Month]>= mindate
+				    && 'Customers Cohort'[First Transaction Month] <= maxdate
+				)
+			formatString: 0
+			lineageTag: aa12ca7f-477b-47de-9ded-fac244d3070d
+
+		partition 'Measure Table' = m
+			mode: import
+			source =
+					let
+					    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+					    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+					    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+					in
+					    #"Removed Columns"
+
+		annotation PBI_ResultType = Table
+
+	table 'Calendar Lookup'
+		excludeFromModelRefresh
+		lineageTag: 72330ed0-7bd0-4220-809b-b06970905aed
+
+		measure '90-day Rolling Profit' =
+				
+				CALCULATE(
+				    [Total Profit],
+				    DATESINPERIOD(
+				        'Calendar Lookup'[Date],
+				        MAX(
+				            'Calendar Lookup'[Date]
+				        ),
+				        -90,
+				        DAY
+				    )
+				)
+			formatString: \$#,0;(\$#,0);\$#,0
+			lineageTag: 4650a76d-3097-474a-aeb1-24403ae9e8e0
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		column Date
+			dataType: dateTime
+			isKey
+			formatString: Short Date
+			lineageTag: 64a92e3c-277f-477a-9d4f-8f39f11ded21
+			summarizeBy: none
+			sourceColumn: Date
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column 'Day Name'
+			dataType: string
+			lineageTag: 639c6036-9205-4cd6-96dd-43a200c57e92
+			summarizeBy: none
+			sourceColumn: Day Name
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Start of Week'
+			dataType: dateTime
+			formatString: Short Date
+			lineageTag: 10628bd8-5d3f-4a55-bf3f-27cffffe912f
+			summarizeBy: none
+			sourceColumn: Start of Week
+
+			changedProperty = IsHidden
+
+			changedProperty = DataType
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column 'Start of Month'
+			dataType: dateTime
+			formatString: mmmm yyyy
+			lineageTag: c7187c48-5f31-424c-aafe-3ac602bce4e2
+			summarizeBy: none
+			sourceColumn: Start of Month
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+			annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+		column 'Start of Quarter'
+			dataType: dateTime
+			formatString: Short Date
+			lineageTag: 664eecb8-559c-475b-b08c-81b559f46e86
+			summarizeBy: none
+			sourceColumn: Start of Quarter
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column 'Month Name'
+			dataType: string
+			lineageTag: 992cbd41-067d-41d2-80ef-d3bbe1e0834b
+			summarizeBy: none
+			sourceColumn: Month Name
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Month
+			dataType: int64
+			formatString: 0
+			lineageTag: ced22d83-4f40-4233-ae9c-afd0522a9e4e
+			summarizeBy: sum
+			sourceColumn: Month
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Start of Year'
+			dataType: dateTime
+			formatString: Short Date
+			lineageTag: 20bd71aa-8167-4a84-945c-99850a146df7
+			summarizeBy: none
+			sourceColumn: Start of Year
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column Year
+			dataType: int64
+			formatString: 0
+			lineageTag: 041326a6-147d-4ba7-8fc3-a2e8c6c02d94
+			summarizeBy: sum
+			sourceColumn: Year
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Month Short' =
+				
+				UPPER(LEFT(
+				    'Calendar Lookup'[Month Name],
+				    3
+				))
+			lineageTag: 58d7dc63-151f-42f3-9aa2-c96327a76be5
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Day of week' =
+				
+				WEEKDAY('Calendar Lookup'[Date],
+				2
+				)
+			formatString: 0
+			lineageTag: 2c2c4218-5664-4169-b3df-4cee14382436
+			summarizeBy: sum
+
+			annotation SummarizationSetBy = Automatic
+
+		column Weekend =
+				
+				IF('Calendar Lookup'[Day of week] IN {6,7},
+				    "weekend",
+				    "weekday"
+				)
+			lineageTag: 68580f7c-9cdb-4998-97f5-f4b13ddef05e
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'End of Month'
+			dataType: dateTime
+			formatString: Short Date
+			lineageTag: a38323b4-88bb-4710-8832-8c5f1855cde6
+			summarizeBy: none
+			sourceColumn: End of Month
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		hierarchy 'Date Hierarchy'
+			lineageTag: a0271ac4-6052-4c74-b458-d9149729ab33
+
+			level 'Start of Year'
+				lineageTag: 96cc97ec-8955-4855-ba76-eaf154b772f3
+				column: 'Start of Year'
+
+			level 'Start of Month'
+				lineageTag: 849ea10b-e8e2-4b7f-b65f-2e4bd46d5c4a
+				column: 'Start of Month'
+
+			level 'Start of Week'
+				lineageTag: bd1d486e-8d84-4ae0-b375-a635ee98fef9
+				column: 'Start of Week'
+
+			level Date
+				lineageTag: b41fb032-a98a-4a8a-8b47-ca878dade2ef
+				column: Date
+
+			changedProperty = IsHidden
+
+		partition 'Calendar Lookup' = m
+			mode: import
+			source =
+					let
+					    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Calendar Lookup.csv"),[Delimiter=",", Columns=1, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+					    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Date", type date}}),
+					    #"Inserted Day Name" = Table.AddColumn(#"Changed Type", "Day Name", each Date.DayOfWeekName([Date]), type text),
+					    #"Inserted Start of Week" = Table.AddColumn(#"Inserted Day Name", "Start of Week", each Date.StartOfWeek([Date],Day.Monday)),
+					    #"Inserted Start of Month" = Table.AddColumn(#"Inserted Start of Week", "Start of Month", each Date.StartOfMonth([Date]), type date),
+					    #"Inserted Start of Quarter" = Table.AddColumn(#"Inserted Start of Month", "Start of Quarter", each Date.StartOfQuarter([Date]), type date),
+					    #"Inserted Month Name" = Table.AddColumn(#"Inserted Start of Quarter", "Month Name", each Date.MonthName([Date]), type text),
+					    #"Inserted Month" = Table.AddColumn(#"Inserted Month Name", "Month", each Date.Month([Date]), Int64.Type),
+					    #"Inserted Start of Year" = Table.AddColumn(#"Inserted Month", "Start of Year", each Date.StartOfYear([Date]), type date),
+					    #"Inserted Year" = Table.AddColumn(#"Inserted Start of Year", "Year", each Date.Year([Date]), Int64.Type),
+					    #"Inserted End of Month" = Table.AddColumn(#"Inserted Year", "End of Month", each Date.EndOfMonth([Date]), type date),
+					    #"Filtered Rows" = Table.SelectRows(#"Inserted End of Month", each true)
+					in
+					    #"Filtered Rows"
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+
+	table 'Customer Lookup'
+		excludeFromModelRefresh
+		lineageTag: dce19ffc-4362-4f8b-96ab-8d400a0f5142
+
+		column CustomerKey
+			dataType: int64
+			isKey
+			formatString: 0
+			lineageTag: c48a344a-be0d-43d5-bc9a-68030ccc5a99
+			summarizeBy: none
+			sourceColumn: CustomerKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Prefix
+			dataType: string
+			lineageTag: 258b4f71-c3b4-4bfc-8b6d-f1ff2a870840
+			summarizeBy: none
+			sourceColumn: Prefix
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column FirstName
+			dataType: string
+			lineageTag: 1b637cb3-377c-4dc5-ad52-05c7ccd692d5
+			summarizeBy: none
+			sourceColumn: FirstName
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column LastName
+			dataType: string
+			lineageTag: 3b6044c1-080a-4304-a0d7-e1eb31a08c1f
+			summarizeBy: none
+			sourceColumn: LastName
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column BirthDate
+			dataType: dateTime
+			formatString: Long Date
+			lineageTag: b9520d53-4a23-4169-a943-77ff64213f41
+			summarizeBy: none
+			sourceColumn: BirthDate
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column MaritalStatus
+			dataType: string
+			lineageTag: 43c885a8-ac9f-47af-a507-1b62ece680e8
+			summarizeBy: none
+			sourceColumn: MaritalStatus
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Gender
+			dataType: string
+			lineageTag: 09d48a9a-0145-4e3c-b69f-7ff21cd4835c
+			summarizeBy: none
+			sourceColumn: Gender
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column EmailAddress
+			dataType: string
+			lineageTag: 6335b93a-c4aa-4de8-85e2-d59c2c778d61
+			summarizeBy: none
+			sourceColumn: EmailAddress
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column AnnualIncome
+			dataType: int64
+			formatString: 0
+			lineageTag: 0e4e5067-1856-464e-b283-c41c2fa19b4a
+			summarizeBy: none
+			sourceColumn: AnnualIncome
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column TotalChildren
+			dataType: int64
+			formatString: 0
+			lineageTag: b9f2007b-92fa-44ab-995a-85f325d6561c
+			summarizeBy: none
+			sourceColumn: TotalChildren
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column EducationLevel
+			dataType: string
+			lineageTag: 94ab424b-c64c-4cb3-9ba2-674fbcd8b15d
+			summarizeBy: none
+			sourceColumn: EducationLevel
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Occupation
+			dataType: string
+			lineageTag: 32c5af8f-d989-46e4-af63-b5193d008d97
+			summarizeBy: none
+			sourceColumn: Occupation
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column HomeOwner
+			dataType: string
+			lineageTag: df4f8246-77b8-4abb-afca-b7b6ee0028dd
+			summarizeBy: none
+			sourceColumn: HomeOwner
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Full Name'
+			dataType: string
+			lineageTag: 33b6f9e3-993d-4fc0-bd9a-6d44105012e8
+			summarizeBy: none
+			sourceColumn: Full Name
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Domain Name'
+			dataType: string
+			lineageTag: d082dbe5-07bb-42f6-a088-296d2b9141b4
+			summarizeBy: none
+			sourceColumn: Domain Name
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Parent =
+				
+				IF(
+				    'Customer Lookup'[TotalChildren] > 0,
+				    "Yes",
+				    "No"
+				)
+			lineageTag: 9d0f7af0-b2d6-480e-8b70-0fef3bd9f914
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Customer Priority' = ```
+				
+				IF(
+				    'Customer Lookup'[Parent] = "Yes" && 
+				    'Customer Lookup'[AnnualIncome] > 100000,
+				    "Priority",
+				    "Standard"
+				)
+				```
+			lineageTag: 6de30ed5-8686-4c10-9366-66a2546d2a1d
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Income Level' =
+				
+				SWITCH(
+				    TRUE(),
+				    'Customer Lookup'[AnnualIncome] >= 150000 , "Very Heigh",
+				    'Customer Lookup'[AnnualIncome] >= 100000 , "Heigh",
+				    'Customer Lookup'[AnnualIncome] >= 50000 , "Average",
+				    "Low"
+				)
+			lineageTag: 867242c3-8a02-4ec2-bc3a-57a3f0641f22
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Education Category' =
+				
+				SWITCH(
+				    'Customer Lookup'[EducationLevel],
+				    "High School", "High School",
+				    "Partial High School", "High School",
+				    "Bachelors","Undergrade",
+				    "Partial College","Undergrade",
+				    "Graduate Degree","Graduate"
+				)
+			lineageTag: 31b036a2-4683-4db4-a2f8-79c58c810600
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Customer Full Name (CC)' = ```
+				
+				'Customer Lookup'[Prefix] & " " & 'Customer Lookup'[FirstName] & " " & 'Customer Lookup'[LastName]
+				
+				```
+			lineageTag: d38c434f-ae71-4785-8267-e44571974c40
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Birth Year' =
+				
+				YEAR('Customer Lookup'[BirthDate]
+				)
+			formatString: 0
+			lineageTag: 5a934a5d-1cec-4ca7-9aab-138898114824
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Customer Lookup' = m
+			mode: import
+			source =
+					let
+					    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Customer Lookup.csv"),[Delimiter=",", Columns=13, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+					    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"CustomerKey", Int64.Type}, {"Prefix", type text}, {"FirstName", type text}, {"LastName", type text}, {"BirthDate", type date}, {"MaritalStatus", type text}, {"Gender", type text}, {"EmailAddress", type text}, {"AnnualIncome", Int64.Type}, {"TotalChildren", Int64.Type}, {"EducationLevel", type text}, {"Occupation", type text}, {"HomeOwner", type text}}),
+					    #"Removed Errors" = Table.RemoveRowsWithErrors(#"Changed Type", {"CustomerKey"}),
+					    #"Filtered Rows" = Table.SelectRows(#"Removed Errors", each [CustomerKey] <> null and [CustomerKey] <> ""),
+					    #"Capitalized Each Word" = Table.TransformColumns(#"Filtered Rows",{{"Prefix", Text.Proper, type text}, {"FirstName", Text.Proper, type text}, {"LastName", Text.Proper, type text}}),
+					    #"Inserted FullNmae Column" = Table.AddColumn(#"Capitalized Each Word", "Full Name", each Text.Combine({[Prefix], [FirstName], [LastName]}, " "), type text),
+					    #"Duplicated Column" = Table.DuplicateColumn(#"Inserted FullNmae Column", "EmailAddress", "EmailAddress - Copy"),
+					    #"Renamed Columns" = Table.RenameColumns(#"Duplicated Column",{{"EmailAddress - Copy", "Domain Name"}}),
+					    #"Extracted Text After Delimiter" = Table.TransformColumns(#"Renamed Columns", {{"Domain Name", each Text.AfterDelimiter(_, "@"), type text}}),
+					    #"Extracted Text Before Delimiter" = Table.TransformColumns(#"Extracted Text After Delimiter", {{"Domain Name", each Text.BeforeDelimiter(_, "."), type text}}),
+					    #"Replaced Value" = Table.ReplaceValue(#"Extracted Text Before Delimiter","-"," ",Replacer.ReplaceText,{"Domain Name"}),
+					    #"Capitalized Each Word1" = Table.TransformColumns(#"Replaced Value",{{"Domain Name", Text.Proper, type text}})
+					in
+					    #"Capitalized Each Word1"
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+
+	table 'Customer Metrics Selection'
+		lineageTag: 812a1709-f969-4c76-8934-f94506434eeb
+
+		column 'Customer Metrics Selection'
+			lineageTag: deb16696-8c88-4791-a627-57a66d390ebe
+			summarizeBy: none
+			sourceColumn: [Value1]
+			sortByColumn: 'Customer Metrics Selection Order'
+
+			relatedColumnDetails
+				groupByColumn: 'Customer Metrics Selection Fields'
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Customer Metrics Selection Fields'
+			isHidden
+			lineageTag: 71184713-b18f-41d0-b06d-7f7b35045753
+			summarizeBy: none
+			sourceColumn: [Value2]
+			sortByColumn: 'Customer Metrics Selection Order'
+
+			extendedProperty ParameterMetadata = {"version":3,"kind":2}
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Customer Metrics Selection Order'
+			isHidden
+			formatString: 0
+			lineageTag: 61fa11a6-07e7-44c0-a902-412dc8ccdd37
+			summarizeBy: sum
+			sourceColumn: [Value3]
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Customer Metrics Selection' = calculated
+			mode: import
+			source =
+					{
+					    ("Total Customers", NAMEOF('Measure Table'[Total Customers]), 0),
+					    ("Revenue Per Customer", NAMEOF('Measure Table'[Average Revenue Per Customer]), 1)
+					}
+
+		annotation PBI_Id = 52396b12694c46a5bfacf15ce9886174
+
+	table 'Data Dictionary'
+		lineageTag: f05849b5-8fe2-4516-8652-a04a0f3579c2
+
+		column Type
+			lineageTag: ce44add5-4c5e-4484-a958-02d9456b6615
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Type]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Name
+			lineageTag: 0984701d-d170-4f56-a8f9-ce7ab0ebba76
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Name]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Location
+			lineageTag: dbebe629-bfe7-432e-b36e-59fc9a5d7143
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Location]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Expression
+			lineageTag: 0ec47306-cd65-4853-b2db-61ef592c68c0
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Expression]
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Data Dictionary' = calculated
+			mode: import
+			source =
+					
+					VAR _columns = SELECTCOLUMNS(
+					FILTER(
+					INFO.VIEW.COLUMNS()
+					,[Table] <> "Data Dictionary" && NOT([IsHidden])
+					)
+					, "Type", "Column"
+					,"Name", [Name]
+					
+					, "Location", [Table]
+					, "Expression", [Expression]
+					)
+					VAR _measures = SELECTCOLUMNS(
+					FILTER(
+					INFO.VIEW.MEASURES()
+					, [Table] <> "Data Dictionary" && NOT([IsHidden])
+					)
+					, "Type", "Measure"
+					, "Name", [Name]
+					
+					, "Location", [Table]
+					, "Expression", [Expression]
+					)
+					VAR _tables = SELECTCOLUMNS(
+					FILTER(
+					INFO.VIEW.TABLES()
+					, [Name] <> "Data Dictionary" && [Name] <> "Calculations" && NOT([IsHidden])
+					)
+					, "Type", "Table"
+					,"Name", [Name]
+					
+					,"Location", BLANK()
+					,"Expression", [Expression]
+					)
+					
+					VAR _relationships = SELECTCOLUMNS(
+					INFO.VIEW.RELATIONSHIPS()
+					, "Type", "Relationship"
+					,"Name", [Relationship]
+					
+					,"Location", Blank()
+					,"Expression", [Relationship]
+					)
+					
+					RETURN
+					UNION(_columns,_measures,_tables,_relationships)
+
+		annotation PBI_Id = 8d5b5008f6b54a179a6d5e2ac713ed75
+
+	table 'Model Columns'
+		lineageTag: 2b17f20a-c000-4a2c-98dd-fe71bfdbbf21
+
+		column ID
+			formatString: 0
+			lineageTag: ba56cc76-f433-4506-a725-94455ef097dd
+			summarizeBy: count
+			isNameInferred
+			sourceColumn: [ID]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Name
+			lineageTag: 82470403-4f76-41ee-a67e-4170c7bb3d83
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Name]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Table
+			lineageTag: ae2863f4-7989-4d85-a1a1-231c8b348011
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Table]
+
+			annotation SummarizationSetBy = Automatic
+
+		column DataType
+			lineageTag: f940d93e-b689-4b98-bc2a-b808ec5ff7fd
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [DataType]
+
+			annotation SummarizationSetBy = Automatic
+
+		column DataCategory
+			lineageTag: 3defdfc0-5deb-4219-9d0c-53cd4b7ec515
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [DataCategory]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Description
+			lineageTag: 015410c6-4c88-40ac-860c-0fcc5ebcaca7
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Description]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsHidden
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 23c0e841-f701-4b08-9027-bc22d3f7cd94
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsHidden]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsUnique
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 9ef80200-f34b-4c6f-881f-80d62450ccdc
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsUnique]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsKey
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: bd9238bb-15d2-472b-be8b-2655e240bf6c
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsKey]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsNullable
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 4f070725-e50a-4d55-aad7-c36a6ed1271c
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsNullable]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Alignment
+			lineageTag: 5631558c-0302-417b-a3b3-216046a57271
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Alignment]
+
+			annotation SummarizationSetBy = Automatic
+
+		column SummarizeBy
+			lineageTag: 9ac79b0a-f41e-4b30-9a94-6faf08cbfdc2
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [SummarizeBy]
+
+			annotation SummarizationSetBy = Automatic
+
+		column ColumnStorage
+			lineageTag: 5aff863c-e6c7-4941-8eb5-63101433f057
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [ColumnStorage]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Type
+			lineageTag: 9ee3c334-90ae-4fbf-9bbe-80659d2358df
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Type]
+
+			annotation SummarizationSetBy = Automatic
+
+		column SourceColumn
+			lineageTag: f6d8c9e7-3727-4f20-8594-f4efefd30f62
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [SourceColumn]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Expression
+			lineageTag: e40c7e0d-611b-4fe1-b53d-65aced8f3ec6
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Expression]
+
+			annotation SummarizationSetBy = Automatic
+
+		column FormatString
+			lineageTag: f8f3d097-c410-454c-8cbf-26de433858b9
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [FormatString]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsAvailableInMDX
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 768dc4d6-a805-4a05-8070-b3b2f995b510
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsAvailableInMDX]
+
+			annotation SummarizationSetBy = Automatic
+
+		column SortByColumn
+			lineageTag: 2d69a664-7b35-4496-8a05-4adeaea2f3db
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [SortByColumn]
+
+			annotation SummarizationSetBy = Automatic
+
+		column GroupingBehavior
+			lineageTag: 6222240d-cb7e-44ed-86d5-6441257bfe9c
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [GroupingBehavior]
+
+			annotation SummarizationSetBy = Automatic
+
+		column SourceProviderType
+			lineageTag: bd767b54-d87e-498a-9594-adad57e48663
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [SourceProviderType]
+
+			annotation SummarizationSetBy = Automatic
+
+		column DisplayFolder
+			lineageTag: e3847255-5d9d-437a-a79b-691a5bcbf08f
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [DisplayFolder]
+
+			annotation SummarizationSetBy = Automatic
+
+		column AlternateOf
+			lineageTag: e51886c9-fa0a-487a-8db2-47e8a58ec40d
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [AlternateOf]
+
+			annotation SummarizationSetBy = Automatic
+
+		column LineageTag
+			lineageTag: 6afa0d4a-a91f-4001-83c8-8a8e06c7ad1d
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [LineageTag]
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Model Columns' = calculated
+			mode: import
+			source = INFO.VIEW.COLUMNS()
+
+		annotation PBI_Id = 60c2447a46444408bacbd11ea92a5951
+
+	table 'Model Measueres'
+		lineageTag: 719b73a1-4a85-4844-85db-8a131e8a9e8c
+
+		column ID
+			formatString: 0
+			lineageTag: 3d313036-3a01-4969-97e3-dc5e41bbba9e
+			summarizeBy: count
+			isNameInferred
+			sourceColumn: [ID]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Name
+			lineageTag: b410eccd-3331-467c-9fe9-247a5cb43057
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Name]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Table
+			lineageTag: aebe8ced-d16a-479e-98a6-9a53555e6c4b
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Table]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Description
+			lineageTag: 9c936530-3ba3-48b1-93bd-efacbd3c20e0
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Description]
+
+			annotation SummarizationSetBy = Automatic
+
+		column DataType
+			lineageTag: 9ba66a85-7598-4bf9-adeb-aaa1990347ed
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [DataType]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Expression
+			lineageTag: 2b87be38-a53c-4d74-b6bc-835698654317
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Expression]
+
+			annotation SummarizationSetBy = Automatic
+
+		column FormatString
+			lineageTag: 44af3cc8-1aa0-4075-bf40-41703ac46ac3
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [FormatString]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsHidden
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: c84ce06b-a9e0-44d1-ba38-209a07757f5f
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsHidden]
+
+			annotation SummarizationSetBy = Automatic
+
+		column State
+			lineageTag: 3119205e-b82e-4a20-ba69-0e1c980d0c69
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [State]
+
+			annotation SummarizationSetBy = Automatic
+
+		column KPIID
+			formatString: 0
+			lineageTag: 8b5d063e-7207-4675-9b26-9e98ff033b63
+			summarizeBy: count
+			isNameInferred
+			sourceColumn: [KPIID]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsSimpleMeasure
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 030b34fa-6926-4103-aadc-933a6180e9df
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsSimpleMeasure]
+
+			annotation SummarizationSetBy = Automatic
+
+		column DisplayFolder
+			lineageTag: e43bcb71-7571-4da4-b599-b396349de92d
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [DisplayFolder]
+
+			annotation SummarizationSetBy = Automatic
+
+		column DetailRowsDefinition
+			lineageTag: 82b153f8-f881-4e51-8e61-d63792f38ea6
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [DetailRowsDefinition]
+
+			annotation SummarizationSetBy = Automatic
+
+		column DataCategory
+			lineageTag: 04320b1f-6453-4532-ab1e-a51ac91af4cd
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [DataCategory]
+
+			annotation SummarizationSetBy = Automatic
+
+		column FormatStringDefinition
+			lineageTag: eab19a93-56c0-4d21-9484-c35a5cdf82b9
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [FormatStringDefinition]
+
+			annotation SummarizationSetBy = Automatic
+
+		column LineageTag
+			lineageTag: 165d1e3b-522f-4529-8003-66515b8be917
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [LineageTag]
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Model Measueres' = calculated
+			mode: import
+			source = INFO.VIEW.MEASURES()
+
+		annotation PBI_Id = bad51e39117a42e9bd3d8404032cd5d9
+
+	table 'Model Releationships'
+		lineageTag: 8b9947b3-26a7-46fd-82ff-354c2ee67880
+
+		column ID
+			formatString: 0
+			lineageTag: c97c6dd1-f2c0-42da-82a3-355bf8f8f779
+			summarizeBy: count
+			isNameInferred
+			sourceColumn: [ID]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Name
+			lineageTag: 12507d15-8221-4073-ac4f-44ad87656049
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Name]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Relationship
+			lineageTag: ad4cdf90-9490-492d-963f-f733443c2b3a
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Relationship]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Model
+			lineageTag: e08da828-5d0e-4f1b-9a8b-cca36537b408
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Model]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsActive
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 20bf5ee6-cdb0-4c06-9956-a67e8dccde8f
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsActive]
+
+			annotation SummarizationSetBy = Automatic
+
+		column CrossFilteringBehavior
+			lineageTag: 1be5143b-edba-4274-a5eb-4641f8d9b199
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [CrossFilteringBehavior]
+
+			annotation SummarizationSetBy = Automatic
+
+		column RelyOnReferentialIntegrity
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: a1998d19-5361-4aa6-9edc-267165f92c3c
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [RelyOnReferentialIntegrity]
+
+			annotation SummarizationSetBy = Automatic
+
+		column FromTable
+			lineageTag: df99c8e9-142b-4250-86f1-7c68c28cc837
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [FromTable]
+
+			annotation SummarizationSetBy = Automatic
+
+		column FromColumn
+			lineageTag: 116d5e34-42c8-498d-a984-13ab1155ef9e
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [FromColumn]
+
+			annotation SummarizationSetBy = Automatic
+
+		column FromCardinality
+			lineageTag: 24cebb10-ffac-48ac-a4cc-35df4c383928
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [FromCardinality]
+
+			annotation SummarizationSetBy = Automatic
+
+		column ToTable
+			lineageTag: 4bba1808-6a29-4cb6-968f-d1725b81a4ad
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [ToTable]
+
+			annotation SummarizationSetBy = Automatic
+
+		column ToColumn
+			lineageTag: e9c55989-8d73-4f6a-8ec4-aea540e79971
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [ToColumn]
+
+			annotation SummarizationSetBy = Automatic
+
+		column ToCardinality
+			lineageTag: 3b7ba473-c41d-4914-b14d-1c8f86318142
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [ToCardinality]
+
+			annotation SummarizationSetBy = Automatic
+
+		column State
+			lineageTag: da5626c8-833f-4e7f-8a08-58f6a5554e3d
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [State]
+
+			annotation SummarizationSetBy = Automatic
+
+		column SecurityFilteringBehavior
+			lineageTag: fb2b2f21-ea52-4b20-a204-ef1a1d0f0522
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [SecurityFilteringBehavior]
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Model Releationships' = calculated
+			mode: import
+			source = INFO.VIEW.RELATIONSHIPS()
+
+		annotation PBI_Id = c207dab5369141e79ee4f057e88c12fe
+
+	table 'Model Tables'
+		lineageTag: abad18bf-08f2-420a-887a-71ccba472f64
+
+		column ID
+			formatString: 0
+			lineageTag: d41ae9c9-3006-4606-b8c4-c8b19c844029
+			summarizeBy: count
+			isNameInferred
+			sourceColumn: [ID]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Name
+			lineageTag: a00ebe93-d57c-4040-bac9-7e01a48e132b
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Name]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Model
+			lineageTag: 633f35dc-f7ce-42c2-a5b7-8043ad612925
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Model]
+
+			annotation SummarizationSetBy = Automatic
+
+		column DataCategory
+			lineageTag: ec0185ea-64b2-4ea4-b2e7-55bbf8330151
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [DataCategory]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Description
+			lineageTag: ec65053c-0e29-4cfd-b61b-033960d51689
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Description]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsHidden
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: bbba86c5-500b-4566-ad5e-e2ff25590559
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsHidden]
+
+			annotation SummarizationSetBy = Automatic
+
+		column StorageMode
+			lineageTag: 2dc8dc67-4f5d-4f5f-8f85-02e7a1762b95
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [StorageMode]
+
+			annotation SummarizationSetBy = Automatic
+
+		column TableStorage
+			lineageTag: 6dde8dae-352b-4bf0-a4fe-7ef4bd2d50b2
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [TableStorage]
+
+			annotation SummarizationSetBy = Automatic
+
+		column Expression
+			lineageTag: ecdf1c42-6d3e-44d8-9e04-98596ef186b5
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [Expression]
+
+			annotation SummarizationSetBy = Automatic
+
+		column ShowAsVariationOnly
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: 8de7c183-80a6-42a1-b95c-5f3fffc3cd89
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [ShowAsVariationOnly]
+
+			annotation SummarizationSetBy = Automatic
+
+		column IsPrivate
+			formatString: """TRUE"";""TRUE"";""FALSE"""
+			lineageTag: b972ad5b-47ad-4235-830a-5e245d4e7ab8
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [IsPrivate]
+
+			annotation SummarizationSetBy = Automatic
+
+		column CalculationGroupPrecedence
+			formatString: 0
+			lineageTag: 0a73139e-78ff-4d83-ae38-80c8476e74b6
+			summarizeBy: sum
+			isNameInferred
+			sourceColumn: [CalculationGroupPrecedence]
+
+			annotation SummarizationSetBy = Automatic
+
+		column LineageTag
+			lineageTag: a5d3ec4f-e984-45c5-ad32-a8cf0228b817
+			summarizeBy: none
+			isNameInferred
+			sourceColumn: [LineageTag]
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Model Tables' = calculated
+			mode: import
+			source = INFO.VIEW.TABLES()
+
+		annotation PBI_Id = b5991b7e575c4bc9b50dfe9028f349da
+
+	table 'Price Adjustment (%)'
+		lineageTag: 4cb1b5d7-6478-491c-806e-0e4391d90771
+
+		measure 'Price Adjustment (%) Value' = SELECTEDVALUE('Price Adjustment (%)'[Price Adjustment (%)], 0)
+			lineageTag: e1ded9b1-ce8d-4c17-b4c4-cc24cff916d3
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		column 'Price Adjustment (%)'
+			lineageTag: 02b85e0e-f5a7-46d1-9553-67647d5b715e
+			summarizeBy: none
+			sourceColumn: [Value]
+
+			extendedProperty ParameterMetadata = {"version":0}
+
+			annotation SummarizationSetBy = User
+
+			annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+		partition 'Price Adjustment (%)' = calculated
+			mode: import
+			source = GENERATESERIES(-1, 1, 0.1)
+
+		annotation PBI_Id = d1128746d1124909800849eda281b573
+
+	table 'Product Categories Lookup'
+		excludeFromModelRefresh
+		lineageTag: 92086a58-8686-4730-a517-32a86d26a928
+
+		column ProductCategoryKey
+			dataType: int64
+			isKey
+			formatString: 0
+			lineageTag: 251cf09c-efca-425a-ab1a-b7c30da990c7
+			summarizeBy: none
+			sourceColumn: ProductCategoryKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column CategoryName
+			dataType: string
+			lineageTag: f5eae25e-8e6e-4175-bf0a-76a40847e4b5
+			summarizeBy: none
+			sourceColumn: CategoryName
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Product Categories Lookup' = m
+			mode: import
+			source =
+					let
+					    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Product Categories Lookup.csv"),[Delimiter=",", Columns=2, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+					    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductCategoryKey", Int64.Type}, {"CategoryName", type text}})
+					in
+					    #"Changed Type"
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+
+	table 'Product Lookup'
+		excludeFromModelRefresh
+		lineageTag: b4b820e2-d13f-4117-82c6-0a1b8ffb9caa
+
+		column ProductKey
+			dataType: int64
+			isKey
+			formatString: 0
+			lineageTag: 1e327a65-3739-47df-b43d-811927308bb6
+			summarizeBy: none
+			sourceColumn: ProductKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductSubcategoryKey
+			dataType: int64
+			formatString: 0
+			lineageTag: 1e5d9e0d-f455-4873-af3e-87b4c763a54c
+			summarizeBy: none
+			sourceColumn: ProductSubcategoryKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductSKU
+			dataType: string
+			lineageTag: 028c1b01-e3dd-4565-9d9c-7aab115827d4
+			summarizeBy: none
+			sourceColumn: ProductSKU
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductName
+			dataType: string
+			lineageTag: 8af9fcba-c47e-4245-b796-5e249bb943e1
+			summarizeBy: none
+			sourceColumn: ProductName
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ModelName
+			dataType: string
+			lineageTag: 0d125f2b-d666-4a0f-9f61-0a6c975fffc6
+			summarizeBy: none
+			sourceColumn: ModelName
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductDescription
+			dataType: string
+			lineageTag: ef2d1bac-ad14-4224-a7ad-1e0d27436730
+			summarizeBy: none
+			sourceColumn: ProductDescription
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductColor
+			dataType: string
+			lineageTag: b8e6dddf-8eed-404d-8a66-d31a6ac20c40
+			summarizeBy: none
+			sourceColumn: ProductColor
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductStyle
+			dataType: string
+			lineageTag: c8b5a32b-4482-4ff8-a9ec-b9ba5a8f5c56
+			summarizeBy: none
+			sourceColumn: ProductStyle
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductCost
+			dataType: decimal
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: d90e3c2a-653e-486a-a56b-151225b78949
+			summarizeBy: sum
+			sourceColumn: ProductCost
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		column ProductPrice
+			dataType: decimal
+			formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+			lineageTag: f50e6582-fbd4-4c08-8964-b13e68b775eb
+			summarizeBy: sum
+			sourceColumn: ProductPrice
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+		column 'SKU Type'
+			dataType: string
+			lineageTag: d57072fa-d8c0-4ac4-8129-b1a3e40935a6
+			summarizeBy: none
+			sourceColumn: SKU Type
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Price Points' =
+				
+				SWITCH(
+				    TRUE(),
+				    'Product Lookup'[ProductPrice] > 500 ,"High",
+				    'Product Lookup'[ProductPrice] > 100 ,"Mid-Range",
+				    "Low"
+				    )
+			lineageTag: 0f0dd47c-ad29-4903-ae36-3f3e1f6e8fd7
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'SKU Category' =
+				
+				LEFT('Product Lookup'[ProductSKU],
+				    SEARCH(
+				        "-",
+				        'Product Lookup'[ProductSKU],
+				    )
+				    -1
+				)
+			lineageTag: 97dd9beb-7c35-4228-bfd9-d5f12270aa26
+			summarizeBy: none
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Product Lookup' = m
+			mode: import
+			source =
+					let
+					    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Product Lookup.csv"),[Delimiter=",", Columns=11, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+					    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					    #"Changed To Currency" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductPrice", Currency.Type}, {"ProductCost", Currency.Type}}),
+					    #"Removed Columns" = Table.RemoveColumns(#"Changed To Currency",{"ProductSize"}),
+					    #"Inserted Text Before Delimiter" = Table.AddColumn(#"Removed Columns", "Text Before Delimiter", each Text.BeforeDelimiter([ProductSKU], "-", 1), type text),
+					    #"Replaced Value" = Table.ReplaceValue(#"Inserted Text Before Delimiter","0","NA",Replacer.ReplaceText,{"ProductStyle"}),
+					    #"Renamed Columns" = Table.RenameColumns(#"Replaced Value",{{"Text Before Delimiter", "SKU Type"}}),
+					    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"ProductKey", Int64.Type}, {"ProductSubcategoryKey", Int64.Type}})
+					in
+					    #"Changed Type"
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+
+	table 'Product Metrics Selection'
+		lineageTag: 51dcb716-3296-4e2e-a35b-e2aa235ca060
+
+		column 'Product Metrics Selection'
+			lineageTag: 0b78edf1-6fdb-409a-b030-2d649ab18314
+			summarizeBy: none
+			sourceColumn: [Value1]
+			sortByColumn: 'Product Metrics Selection Order'
+
+			relatedColumnDetails
+				groupByColumn: 'Product Metrics Selection Fields'
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Product Metrics Selection Fields'
+			isHidden
+			lineageTag: 02cd48e2-ce61-4c34-8c12-8c74e18d5e6d
+			summarizeBy: none
+			sourceColumn: [Value2]
+			sortByColumn: 'Product Metrics Selection Order'
+
+			extendedProperty ParameterMetadata = {"version":3,"kind":2}
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Product Metrics Selection Order'
+			isHidden
+			formatString: 0
+			lineageTag: 1ce97cbd-69c0-458a-b119-a8de716eb357
+			summarizeBy: sum
+			sourceColumn: [Value3]
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Product Metrics Selection' = calculated
+			mode: import
+			source =
+					{
+					    ("Orders", NAMEOF('Measure Table'[Total Orders]), 0),
+					    ("Revenue", NAMEOF('Measure Table'[Total Revenue]), 1),
+					    ("Profit", NAMEOF('Measure Table'[Total Profit]), 2),
+					    ("Returns", NAMEOF('Measure Table'[Total Returns]), 3),
+					    ("Return %", NAMEOF('Measure Table'[Return Rate]), 4)
+					}
+
+		annotation PBI_Id = b8214d2ea46b4a03a93fcfe94c15af38
+
+	table 'Product Subcategories Lookup'
+		excludeFromModelRefresh
+		lineageTag: 445a780e-2444-47e3-9152-9dde8ef89f8a
+
+		column ProductSubcategoryKey
+			dataType: int64
+			isKey
+			formatString: 0
+			lineageTag: 816eb812-2570-44c5-a1c3-ab9bd59d8f6f
+			summarizeBy: none
+			sourceColumn: ProductSubcategoryKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column SubcategoryName
+			dataType: string
+			lineageTag: f1b7578a-d87c-456d-a2bb-24b47a4ea7cf
+			summarizeBy: none
+			sourceColumn: SubcategoryName
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductCategoryKey
+			dataType: int64
+			formatString: 0
+			lineageTag: 9bf4614c-7fd6-4710-8618-396068b84a95
+			summarizeBy: none
+			sourceColumn: ProductCategoryKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Product Subcategories Lookup' = m
+			mode: import
+			source =
+					let
+					    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Product Subcategories Lookup.csv"),[Delimiter=",", Columns=3, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+					    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductSubcategoryKey", Int64.Type}, {"SubcategoryName", type text}, {"ProductCategoryKey", Int64.Type}})
+					in
+					    #"Changed Type"
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+
+	table 'Returns Data'
+		lineageTag: 7810ace8-e88e-430f-abc2-4854ea5b2b3c
+
+		column ReturnDate
+			dataType: dateTime
+			formatString: Short Date
+			lineageTag: 8dce3daf-de63-4321-b3b3-566c0e9bf548
+			summarizeBy: none
+			sourceColumn: ReturnDate
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column TerritoryKey
+			dataType: int64
+			formatString: 0
+			lineageTag: 14a09f21-3e2d-4f6f-8a1a-a77ba7bff5d1
+			summarizeBy: none
+			sourceColumn: TerritoryKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductKey
+			dataType: int64
+			formatString: 0
+			lineageTag: f975bfde-ba3f-4522-9881-26ff354bfaa7
+			summarizeBy: none
+			sourceColumn: ProductKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ReturnQuantity
+			dataType: int64
+			formatString: 0
+			lineageTag: 8aefab5d-2399-4b7d-8d9e-6d9567975b49
+			summarizeBy: sum
+			sourceColumn: ReturnQuantity
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Returns Data' = m
+			mode: import
+			source =
+					let
+					    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Returns Data.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+					    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"ReturnDate", type date}, {"TerritoryKey", Int64.Type}, {"ProductKey", Int64.Type}, {"ReturnQuantity", Int64.Type}})
+					in
+					    #"Changed Type"
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+
+	table 'Sales Data'
+		lineageTag: 19aaadbb-8690-4604-bf80-1c1f35cfae1c
+
+		column OrderDate
+			dataType: dateTime
+			formatString: Short Date
+			lineageTag: b1266d64-d744-43ec-8472-4327a756eeb0
+			summarizeBy: none
+			sourceColumn: OrderDate
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column StockDate
+			dataType: dateTime
+			formatString: Short Date
+			lineageTag: 914aa0c0-6152-4ab6-b796-20f188699c2b
+			summarizeBy: none
+			sourceColumn: StockDate
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+			annotation UnderlyingDateTimeDataType = Date
+
+		column OrderNumber
+			dataType: string
+			lineageTag: e0c045af-fb5e-46ae-a05b-723af984a947
+			summarizeBy: none
+			sourceColumn: OrderNumber
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column ProductKey
+			dataType: int64
+			formatString: 0
+			lineageTag: d0e65a93-63a5-435a-8b5c-90179e48a961
+			summarizeBy: none
+			sourceColumn: ProductKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column CustomerKey
+			dataType: int64
+			formatString: 0
+			lineageTag: e42b160c-77fd-4b6e-b1f8-901e91797f96
+			summarizeBy: none
+			sourceColumn: CustomerKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column TerritoryKey
+			dataType: int64
+			formatString: 0
+			lineageTag: e1ea86dc-68ac-4c2b-bec6-d75fc2e2f6b4
+			summarizeBy: none
+			sourceColumn: TerritoryKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column OrderLineItem
+			dataType: int64
+			formatString: 0
+			lineageTag: 81341341-4999-4b3b-821a-16d80649f9c8
+			summarizeBy: sum
+			sourceColumn: OrderLineItem
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column OrderQuantity
+			dataType: int64
+			formatString: 0
+			lineageTag: c3770612-366b-4c34-90f0-23b9bb7ba612
+			summarizeBy: sum
+			sourceColumn: OrderQuantity
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Quantity Type' =
+				
+				IF(
+				    'Sales Data'[OrderQuantity] > 1,
+				    "Multiple Items",
+				    "Single Item"
+				)
+			lineageTag: 897d277f-a1a3-4b27-9aee-adbd299c7c83
+			summarizeBy: none
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column 'Months Since First Transaction' =
+				
+				DATEDIFF(
+				    RELATED('Customers Cohort'[First Transaction Month]),
+				    RELATED('Calendar Lookup'[Start of Month]),
+				    MONTH
+				)
+			formatString: 0
+			lineageTag: 4094623c-85d2-4044-8474-55a31fb5c60c
+			summarizeBy: sum
+
+			annotation SummarizationSetBy = Automatic
+
+		partition 'Sales Data' = m
+			mode: import
+			source =
+					let
+					    Source = Folder.Files("G:\All_My_Projects\PowerBiProject\Sales Data"),
+					    #"Filtered Hidden Files1" = Table.SelectRows(Source, each [Attributes]?[Hidden]? <> true),
+					    #"Invoke Custom Function1" = Table.AddColumn(#"Filtered Hidden Files1", "Transform File", each #"Transform File"([Content])),
+					    #"Renamed Columns1" = Table.RenameColumns(#"Invoke Custom Function1", {"Name", "Source.Name"}),
+					    #"Removed Other Columns1" = Table.SelectColumns(#"Renamed Columns1", {"Source.Name", "Transform File"}),
+					    #"Expanded Table Column1" = Table.ExpandTableColumn(#"Removed Other Columns1", "Transform File", Table.ColumnNames(#"Transform File"(#"Sample File"))),
+					    #"Changed Type" = Table.TransformColumnTypes(#"Expanded Table Column1",{{"Source.Name", type text}, {"OrderDate", type date}, {"StockDate", type date}, {"OrderNumber", type text}, {"ProductKey", Int64.Type}, {"CustomerKey", Int64.Type}, {"TerritoryKey", Int64.Type}, {"OrderLineItem", Int64.Type}, {"OrderQuantity", Int64.Type}}),
+					    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Source.Name"}),
+					    #"Changed Type1" = Table.TransformColumnTypes(#"Removed Columns",{{"OrderDate", type date}})
+					in
+					    #"Changed Type1"
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+
+	table 'Territory Lookup'
+		excludeFromModelRefresh
+		lineageTag: 59ab0e9e-61fb-42b6-bda9-6e7cde5b9858
+
+		column SalesTerritoryKey
+			dataType: int64
+			isKey
+			formatString: 0
+			lineageTag: e484cb94-57a3-40f2-b02c-4d2321875363
+			summarizeBy: none
+			sourceColumn: SalesTerritoryKey
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Region
+			dataType: string
+			lineageTag: 1514ba74-b358-4257-92bc-49a7a2a4a27d
+			summarizeBy: none
+			sourceColumn: Region
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Country
+			dataType: string
+			lineageTag: 87037204-111e-41cd-b087-a28bcb589364
+			dataCategory: Country
+			summarizeBy: none
+			sourceColumn: Country
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		column Continent
+			dataType: string
+			lineageTag: 37093439-16ad-42f4-950b-067f78f2192b
+			dataCategory: Continent
+			summarizeBy: none
+			sourceColumn: Continent
+
+			changedProperty = IsHidden
+
+			annotation SummarizationSetBy = Automatic
+
+		hierarchy 'Territory Hierarchy'
+			lineageTag: 7176c021-114c-4569-8c2a-5490bfdb9dfb
+
+			level Continent
+				lineageTag: 081ca03e-7db3-4772-8f90-991f2528da40
+				column: Continent
+
+			level Country
+				lineageTag: 2e335705-4b70-442d-a7c5-d2e9f73bd61d
+				column: Country
+
+			level Region
+				lineageTag: 4d235165-faec-485b-8ac8-a08b7a2a711c
+				column: Region
+
+			changedProperty = IsHidden
+
+		partition 'Territory Lookup' = m
+			mode: import
+			source =
+					let
+					    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Territory Lookup.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+					    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+					    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"SalesTerritoryKey", Int64.Type}, {"Region", type text}, {"Country", type text}, {"Continent", type text}})
+					in
+					    #"Changed Type"
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+

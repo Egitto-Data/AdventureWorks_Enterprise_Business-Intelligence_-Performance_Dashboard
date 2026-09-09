@@ -1,0 +1,80 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "cb59caec3086d0a68d2a",
+  "displayName": "Exec Dashboard",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280,
+  "objects": {
+    "outspacePane": [
+      {
+        "properties": {
+          "width": {
+            "expr": {
+              "Literal": {
+                "Value": "248L"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "visualInteractions": [
+    {
+      "source": "f0c855a007bbd4ba2121",
+      "target": "4a18072f80ce678710e3",
+      "type": "DataFilter"
+    },
+    {
+      "source": "4a18072f80ce678710e3",
+      "target": "ff43962e849314215706",
+      "type": "NoFilter"
+    },
+    {
+      "source": "4a18072f80ce678710e3",
+      "target": "7f3a48b6639230ccc680",
+      "type": "NoFilter"
+    },
+    {
+      "source": "4a18072f80ce678710e3",
+      "target": "35ddeae9e62592d1e637",
+      "type": "NoFilter"
+    },
+    {
+      "source": "8702aeb3a4462d207d32",
+      "target": "a773ea85b9657d500602",
+      "type": "DataFilter"
+    },
+    {
+      "source": "8702aeb3a4462d207d32",
+      "target": "693df2310edb1c280087",
+      "type": "DataFilter"
+    },
+    {
+      "source": "8702aeb3a4462d207d32",
+      "target": "35ddeae9e62592d1e637",
+      "type": "NoFilter"
+    },
+    {
+      "source": "8702aeb3a4462d207d32",
+      "target": "7f3a48b6639230ccc680",
+      "type": "NoFilter"
+    },
+    {
+      "source": "8702aeb3a4462d207d32",
+      "target": "ff43962e849314215706",
+      "type": "NoFilter"
+    },
+    {
+      "source": "f0c855a007bbd4ba2121",
+      "target": "cd394a6da4292bd70100",
+      "type": "NoFilter"
+    },
+    {
+      "source": "f0c855a007bbd4ba2121",
+      "target": "9c7714a84e07dc6eb40c",
+      "type": "NoFilter"
+    }
+  ]
+}

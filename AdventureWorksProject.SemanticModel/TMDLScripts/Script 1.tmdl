@@ -1,0 +1,345 @@
+createOrReplace
+
+    ref table 'Measure Table'
+
+        /// Percentage of total orders compared to all orders in the dataset.
+        measure '% Of All Orders' =
+                
+                DIVIDE(
+                    [Total Orders],
+                    [All Orders]
+                )
+
+        /// Percentage of total returns compared to all returns in the dataset.
+        measure '% of All Returns' =
+                
+                DIVIDE(
+                    [Total Returns],
+                    [All Returns]
+                )
+
+        /// Total revenue calculated over the last 10 days from the current date.
+        measure '10-day Rolling Revenue' =
+                
+                CALCULATE(
+                    [Total Revenue],
+                    DATESINPERIOD(
+                        'Calendar Lookup'[Date],
+                        MAX(
+                            'Calendar Lookup'[Date]
+                        ),
+                        -10,
+                        DAY
+                    )
+                )
+
+        /// Average retail price adjusted by the selected percentage parameter.
+        measure 'Adjusted Price' = [Average Retail Price] * (1 + 'Price Adjustment (%)'[Price Adjustment (%) Value])
+
+        /// Profit after applying adjusted revenue minus total cost.
+        measure 'Adjusted Profit' =
+                
+                [Adjusted Revenue] - [Total Cost]
+
+        /// Revenue based on adjusted product prices multiplied by order quantities.
+        measure 'Adjusted Revenue' =
+                
+                SUMX(
+                    'Sales Data',
+                    'Sales Data'[OrderQuantity] * 
+                    [Adjusted Price]
+                )
+
+        /// Total orders ignoring all filters applied to the sales data.
+        measure 'All Orders' =
+                
+                CALCULATE(
+                    [Total Orders],
+                    ALL(
+                        'Sales Data'
+                    )
+                )
+
+        /// Total returns ignoring all filters applied to the returns data.
+        measure 'All Returns' =
+                
+                CALCULATE(
+                    [Total Returns],
+                    ALL(
+                        'Returns Data'
+                    )
+                )
+
+        /// Average unit price across all products in the catalog.
+        measure 'Average Retail Price' =
+                
+                AVERAGE(
+                    'Product Lookup'[ProductPrice]
+                )
+
+        /// Average revenue generated per unique customer.
+        measure 'Average Revenue Per Customer' =
+                
+                DIVIDE(
+                    [Total Revenue],
+                    [Total Customers]
+                )
+
+        /// Return rate specifically for products in the Bikes category.
+        measure 'Bike Return Rate' =
+                
+                CALCULATE(
+                    [Return Rate],
+                    'Product Categories Lookup'[CategoryName] = "Bikes"
+                )
+
+        /// Total returns for products in the Bikes category.
+        measure 'Bike Returns' =
+                
+                CALCULATE(
+                    [Total Returns],
+                    'Product Categories Lookup'[CategoryName] = "Bikes"
+                )
+
+        /// Total units sold for products in the Bikes category.
+        measure 'Bike Sales' =
+                
+                CALCULATE(
+                    [Quantity Sold],
+                    'Product Categories Lookup'[CategoryName] = "Bikes"
+                )
+
+        /// Orders where quantity purchased is greater than one unit.
+        measure 'Bulk Orders' =
+                
+                CALCULATE(
+                    [Total Orders],
+                    'Sales Data'[OrderQuantity] > 1
+                )
+
+        /// Displays customer full name if one customer is selected, otherwise shows 'Multiple Customers'.
+        measure 'Full Name (Customer Detail)' =
+                
+                IF(
+                    HASONEVALUE(
+                        'Customer Lookup'[CustomerKey]
+                    ),
+                    MAX(
+                        'Customer Lookup'[Full Name]
+                    ),
+                    "Multiple Customers"
+                )
+
+        /// Number of new customers making their first purchase in the selected month.
+        measure 'New Customers' =
+                
+                CALCULATE(
+                    [Total Customers],
+                    'Sales Data'[Months Since First Transaction] = 0
+                )
+
+        /// Target orders projected as 10% higher than previous month’s orders.
+        measure 'Order Target' =
+                
+                [Previous Month Orders] * 1.1
+
+        /// Difference between actual orders and target orders.
+        measure 'Order Target Gap' =
+                
+                [Total Orders] - [Order Target]
+
+        /// Average retail price across all products ignoring filters.
+        measure 'Overall Average Price' =
+                
+                CALCULATE(
+                    [Average Retail Price],
+                    ALL(
+                        'Product Lookup'
+                    )
+                )
+
+        /// Total orders in the previous month relative to current filter context.
+        measure 'Previous Month Orders' =
+                
+                CALCULATE(
+                    [Total Orders],
+                    DATEADD('Calendar Lookup'[Date],
+                    -1
+                    ,MONTH
+                    )
+                )
+
+        /// Total profit achieved in the previous month.
+        measure 'Previous Month Profit' =
+                
+                CALCULATE(
+                    [Total Profit],
+                    DATEADD('Calendar Lookup'[Date],
+                    -1,
+                    MONTH
+                    )
+                )
+
+        /// Total returns recorded in the previous month.
+        measure 'Previous Month Returns' =
+                
+                CALCULATE(
+                    [Total Returns],
+                    DATEADD(
+                        'Calendar Lookup'[Date],
+                        -1,
+                        MONTH
+                    )
+                )
+
+        /// Total revenue generated in the previous month.
+        measure 'Previous Month Revenue' =
+                
+                CALCULATE(
+                    [Total Revenue],
+                    DATEADD('Calendar Lookup'[Date],
+                    -1,
+                    MONTH
+                    )
+                )
+
+        /// Target profit projected as 10% higher than previous month’s profit.
+        measure 'Profit Target' =
+                
+                [Previous Month Profit] * 1.1
+
+        /// Difference between actual profit and profit target.
+        measure 'Profit Target Gap' =
+                
+                [Total Profit] - [Profit Target]
+
+        /// Total units returned across all return records.
+        measure 'Quantity Returned' =
+                
+                SUM(
+                    'Returns Data'[ReturnQuantity]
+                )
+
+        /// Total units sold across all sales records.
+        measure 'Quantity Sold' =
+                
+                SUM(
+                    'Sales Data'[OrderQuantity]
+                )
+
+        /// Return rate calculated as ratio of units returned to units sold.
+        measure 'Return Rate' =
+                
+                DIVIDE(
+                    [Quantity Returned],
+                    [Quantity Sold],
+                    "No Sales"
+                )
+
+        /// Custom SVG graphic showing monthly revenue and target progress.
+        measure 'Revenue KPI Card SVG'
+
+        /// Target revenue projected as 10% higher than previous month’s revenue.
+        measure 'Revenue Target' =
+                
+                [Previous Month Revenue] * 1.1
+
+        /// Difference between actual revenue and revenue target.
+        measure 'Revenue Target Gap' =
+                
+                [Total Revenue] - [Revenue Target]
+
+        /// Total cost calculated as order quantity multiplied by product cost.
+        measure 'Total Cost' =
+                
+                SUMX(
+                    'Sales Data',
+                    'Sales Data'[OrderQuantity] 
+                    *
+                    RELATED(
+                        'Product Lookup'[ProductCost]
+                    )
+                )
+
+        /// Total distinct customers based on sales records.
+        measure 'Total Customers' =
+                
+                DISTINCTCOUNT(
+                    'Sales Data'[CustomerKey]
+                )
+
+        /// Total distinct orders based on sales records.
+        measure 'Total Orders' =
+                
+                DISTINCTCOUNT(
+                    'Sales Data'[OrderNumber]
+                )
+
+        /// Displays total orders if one customer is selected, otherwise shows '-'.
+        measure 'Total Orders (Customer Detail)' =
+                
+                IF(
+                    HASONEVALUE(
+                        'Customer Lookup'[CustomerKey]
+                    ),
+                    [Total Orders],
+                    "-"
+                )
+
+        /// Total profit calculated as revenue minus cost.
+        measure 'Total Profit' =
+                
+                [Total Revenue] - [Total Cost]
+
+        /// Total count of return records.
+        measure 'Total Returns' =
+                
+                COUNTROWS(
+                    'Returns Data'
+                )
+
+        /// Total revenue calculated as order quantity multiplied by product price.
+        measure 'Total Revenue' =
+                
+                SUMX(
+                    'Sales Data',
+                    'Sales Data'[OrderQuantity] * 
+                    RELATED(
+                        'Product Lookup'[ProductPrice]
+                    )
+                )
+
+        /// Displays total revenue if one customer is selected, otherwise shows '-'.
+        measure 'Total Revenue (Customer Detail)' =
+                
+                IF(
+                    HASONEVALUE(
+                        'Customer Lookup'[CustomerKey]
+                    ),
+                    [Total Revenue],
+                    "-"
+                )
+
+        /// Total orders placed during weekends.
+        measure 'Weekend Orders' =
+                
+                CALCULATE(
+                    [Total Orders],
+                    'Calendar Lookup'[Weekend] = "weekend"
+                )
+
+        /// Year-to-date revenue based on selected date context.
+        measure 'YTD Revenue' =
+                
+                CALCULATE(
+                    [Total Revenue],
+                    DATESYTD('Calendar Lookup'[Date]
+                    )
+                )
+
+    ref table 'Calendar Lookup'
+
+        /// Total profit calculated over the last 90 days from the current date.
+        measure '90-day Rolling Profit' =
+                
+                C

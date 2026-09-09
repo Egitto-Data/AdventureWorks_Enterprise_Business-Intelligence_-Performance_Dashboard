@@ -1,0 +1,387 @@
+table 'Measure Table'
+	lineageTag: a55f914a-fd36-4eb8-94bb-8a12b836185e
+
+	/// Total units returned across all return records.
+	measure 'Quantity Returned' =
+			
+			SUM(
+			    'Returns Data'[ReturnQuantity]
+			)
+		lineageTag: 1bcadfdc-7e51-4250-a876-00efd79638fe
+
+	/// Total units sold across all sales records.
+	measure 'Quantity Sold' =
+			
+			SUM(
+			    'Sales Data'[OrderQuantity]
+			)
+		lineageTag: 0439b49a-95c0-4115-b785-a406d0a20814
+
+	/// Average unit price across all products in the catalog.
+	measure 'Average Retail Price' =
+			
+			AVERAGE(
+			    'Product Lookup'[ProductPrice]
+			)
+		lineageTag: 4d539e73-3f5d-4629-b60e-3f3817125e6c
+
+	/// Total count of return records.
+	measure 'Total Returns' =
+			
+			COUNTROWS(
+			    'Returns Data'
+			)
+		lineageTag: 35ef8e76-7b77-4e3b-83bc-d9b8fd684e50
+
+	/// Total distinct orders based on sales records.
+	measure 'Total Orders' =
+			
+			DISTINCTCOUNT(
+			    'Sales Data'[OrderNumber]
+			)
+		lineageTag: 39f8f5c3-d765-441f-afa6-992a364fe533
+
+	/// Total distinct customers based on sales records.
+	measure 'Total Customers' =
+			
+			DISTINCTCOUNT(
+			    'Sales Data'[CustomerKey]
+			)
+		lineageTag: b2a34204-c2f8-4da5-a611-3a0a26c3f040
+
+	/// Return rate calculated as ratio of units returned to units sold.
+	measure 'Return Rate' =
+			
+			DIVIDE(
+			    [Quantity Returned],
+			    [Quantity Sold],
+			    "No Sales"
+			)
+		lineageTag: c964fdca-6f89-4030-a429-fdd2f567763c
+
+	/// Orders where quantity purchased is greater than one unit.
+	measure 'Bulk Orders' =
+			
+			CALCULATE(
+			    [Total Orders],
+			    'Sales Data'[OrderQuantity] > 1
+			)
+		lineageTag: 76d152da-f288-4854-a2b3-1e3096e0284f
+
+	/// Total orders placed during weekends.
+	measure 'Weekend Orders' =
+			
+			CALCULATE(
+			    [Total Orders],
+			    'Calendar Lookup'[Weekend] = "weekend"
+			)
+		lineageTag: 755cc8d5-1d66-4cfc-8bbd-923ea888eede
+
+	/// Total returns for products in the Bikes category.
+	measure 'Bike Returns' =
+			
+			CALCULATE(
+			    [Total Returns],
+			    'Product Categories Lookup'[CategoryName] = "Bikes"
+			)
+		lineageTag: ab086373-85f5-4feb-8f50-e4ed7fd2ee52
+
+	/// Total units sold for products in the Bikes category.
+	measure 'Bike Sales' =
+			
+			CALCULATE(
+			    [Quantity Sold],
+			    'Product Categories Lookup'[CategoryName] = "Bikes"
+			)
+		lineageTag: 14d52314-e77a-4b99-933d-d373f90c58a9
+
+	/// Return rate specifically for products in the Bikes category.
+	measure 'Bike Return Rate' =
+			
+			CALCULATE(
+			    [Return Rate],
+			    'Product Categories Lookup'[CategoryName] = "Bikes"
+			)
+		lineageTag: 6447a3b4-0e00-45c4-964f-d3a266d5a498
+
+	/// Total orders ignoring all filters applied to the sales data.
+	measure 'All Orders' =
+			
+			CALCULATE(
+			    [Total Orders],
+			    ALL(
+			        'Sales Data'
+			    )
+			)
+		lineageTag: 3b7d97af-8cff-4b8d-bed8-6266dad8fa21
+
+	/// Percentage of total orders compared to all orders in the dataset.
+	measure '% Of All Orders' =
+			
+			DIVIDE(
+			    [Total Orders],
+			    [All Orders]
+			)
+		lineageTag: 7b649960-db20-4354-a708-8be69ebcbba7
+
+	/// Average retail price across all products ignoring filters.
+	measure 'Overall Average Price' =
+			
+			CALCULATE(
+			    [Average Retail Price],
+			    ALL(
+			        'Product Lookup'
+			    )
+			)
+		lineageTag: e5996077-970f-4da7-a779-12bb41ef0674
+
+	/// Total returns ignoring all filters applied to the returns data.
+	measure 'All Returns' =
+			
+			CALCULATE(
+			    [Total Returns],
+			    ALL(
+			        'Returns Data'
+			    )
+			)
+		lineageTag: 37f9bd85-378f-4937-98e2-a35b6400befc
+
+	/// Percentage of total returns compared to all returns in the dataset.
+	measure '% of All Returns' =
+			
+			DIVIDE(
+			    [Total Returns],
+			    [All Returns]
+			)
+		lineageTag: 25816404-8760-40d5-987d-fadcd257d6dc
+
+	/// Total revenue calculated as order quantity multiplied by product price.
+	measure 'Total Revenue' =
+			
+			SUMX(
+			    'Sales Data',
+			    'Sales Data'[OrderQuantity] *
+			    RELATED(
+			        'Product Lookup'[ProductPrice]
+			    )
+			)
+		lineageTag: 610354e0-4c86-4da7-8e99-b2dde329168d
+
+	/// Average revenue generated per unique customer.
+	measure 'Average Revenue Per Customer' =
+			
+			DIVIDE(
+			    [Total Revenue],
+			    [Total Customers]
+			)
+		lineageTag: fee7192a-0491-471b-881f-c280310db02b
+
+	/// Total cost calculated as order quantity multiplied by product cost.
+	measure 'Total Cost' =
+			
+			SUMX(
+			    'Sales Data',
+			    'Sales Data'[OrderQuantity]
+			    *
+			    RELATED(
+			        'Product Lookup'[ProductCost]
+			    )
+			)
+		lineageTag: 3fbd4072-9e00-471e-89f4-422e2fffb9ae
+
+	/// Total profit calculated as revenue minus cost.
+	measure 'Total Profit' =
+			
+			[Total Revenue] - [Total Cost]
+		lineageTag: 8f0e597e-8a95-493d-a01e-93705e961b0b
+
+	/// Year-to-date revenue based on selected date context.
+	measure 'YTD Revenue' =
+			
+			CALCULATE(
+			    [Total Revenue],
+			    DATESYTD('Calendar Lookup'[Date]
+			    )
+			)
+		lineageTag: 62a02a84-0a91-45c1-8777-b0237008a19c
+
+	/// Total revenue generated in the previous month.
+	measure 'Previous Month Revenue' =
+			
+			CALCULATE(
+			    [Total Revenue],
+			    DATEADD('Calendar Lookup'[Date],
+			    -1,
+			    MONTH
+			    )
+			)
+		lineageTag: a039ccfe-bdbf-48d3-9e99-ff4c27395ab4
+
+	/// Target revenue projected as 10% higher than previous month’s revenue.
+	measure 'Revenue Target' =
+			
+			[Previous Month Revenue] * 1.1
+		lineageTag: 74224b27-49c8-44e8-a139-6f3187846097
+
+	/// Total revenue calculated over the last 10 days from the current date.
+	measure '10-day Rolling Revenue' =
+			
+			CALCULATE(
+			    [Total Revenue],
+			    DATESINPERIOD(
+			        'Calendar Lookup'[Date],
+			        MAX(
+			            'Calendar Lookup'[Date]
+			        ),
+			        -10,
+			        DAY
+			    )
+			)
+		lineageTag: 701df070-212c-425e-aa6f-c468ab97483f
+
+	/// Total orders in the previous month relative to current filter context.
+	measure 'Previous Month Orders' =
+			
+			CALCULATE(
+			    [Total Orders],
+			    DATEADD('Calendar Lookup'[Date],
+			    -1
+			    ,MONTH
+			    )
+			)
+		lineageTag: b56fe93e-2a9a-4330-ba0a-3b661d538e08
+
+	/// Total returns recorded in the previous month.
+	measure 'Previous Month Returns' =
+			
+			CALCULATE(
+			    [Total Returns],
+			    DATEADD(
+			        'Calendar Lookup'[Date],
+			        -1,
+			        MONTH
+			    )
+			)
+		lineageTag: 2b2b11e4-c1cd-4e9d-b318-3cf19b9bd748
+
+	/// Total profit achieved in the previous month.
+	measure 'Previous Month Profit' =
+			
+			CALCULATE(
+			    [Total Profit],
+			    DATEADD('Calendar Lookup'[Date],
+			    -1,
+			    MONTH
+			    )
+			)
+		lineageTag: 11e1247c-3cb8-413b-9d6b-f421314b0925
+
+	/// Target orders projected as 10% higher than previous month’s orders.
+	measure 'Order Target' =
+			
+			[Previous Month Orders] * 1.1
+		lineageTag: 91cb3c33-9b6b-4736-ae8d-c76f25be3cbe
+
+	/// Target profit projected as 10% higher than previous month’s profit.
+	measure 'Profit Target' =
+			
+			[Previous Month Profit] * 1.1
+		lineageTag: 64be3f20-5a52-4785-a404-39e80936387c
+
+	/// Displays total orders if one customer is selected, otherwise shows '-'.
+	measure 'Total Orders (Customer Detail)' =
+			
+			IF(
+			    HASONEVALUE(
+			        'Customer Lookup'[CustomerKey]
+			    ),
+			    [Total Orders],
+			    "-"
+			)
+		lineageTag: 6af8516b-c2b7-4919-868d-df808974237e
+
+	/// Displays total revenue if one customer is selected, otherwise shows '-'.
+	measure 'Total Revenue (Customer Detail)' =
+			
+			IF(
+			    HASONEVALUE(
+			        'Customer Lookup'[CustomerKey]
+			    ),
+			    [Total Revenue],
+			    "-"
+			)
+		lineageTag: b9f8b44f-fb9d-4192-a0f9-0ad78bb62631
+
+	/// Displays customer full name if one customer is selected, otherwise shows 'Multiple Customers'.
+	measure 'Full Name (Customer Detail)' =
+			
+			IF(
+			    HASONEVALUE(
+			        'Customer Lookup'[CustomerKey]
+			    ),
+			    MAX(
+			        'Customer Lookup'[Full Name]
+			    ),
+			    "Multiple Customers"
+			)
+		lineageTag: 1190f6c5-97ea-4e3c-86c1-dd75a72abe8c
+
+	/// Difference between actual orders and target orders.
+	measure 'Order Target Gap' =
+			
+			[Total Orders] - [Order Target]
+		lineageTag: c9341d79-2730-461b-8572-f680b2bf720b
+
+	/// Difference between actual revenue and revenue target.
+	measure 'Revenue Target Gap' =
+			
+			[Total Revenue] - [Revenue Target]
+		lineageTag: 53a99e58-38ac-447d-8085-a5cd2a59663a
+
+	/// Difference between actual profit and profit target.
+	measure 'Profit Target Gap' =
+			
+			[Total Profit] - [Profit Target]
+		lineageTag: 0f819c9d-a34b-485d-b356-4b7b4a5d516e
+
+	/// Average retail price adjusted by the selected percentage parameter.
+	measure 'Adjusted Price' = [Average Retail Price] * (1 + 'Price Adjustment (%)'[Price Adjustment (%) Value])
+		lineageTag: af6b41e0-4a23-44de-9f8e-1dda6a97e78c
+
+	/// Revenue based on adjusted product prices multiplied by order quantities.
+	measure 'Adjusted Revenue' =
+			
+			SUMX(
+			    'Sales Data',
+			    'Sales Data'[OrderQuantity] *
+			    [Adjusted Price]
+			)
+		lineageTag: 9e09848d-c490-4a62-a90e-cde14fec2b4d
+
+	/// Profit after applying adjusted revenue minus total cost.
+	measure 'Adjusted Profit' =
+			
+			[Adjusted Revenue] - [Total Cost]
+		lineageTag: 91648e66-3766-48b0-b6d7-15d94065c5b7
+
+	/// Number of new customers making their first purchase in the selected month.
+	measure 'New Customers' =
+			
+			CALCULATE(
+			    [Total Customers],
+			    'Sales Data'[Months Since First Transaction] = 0
+			)
+		lineageTag: 5c16eb2a-d78a-482e-97e4-d7b224c4df51
+
+	partition 'Measure Table' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,211 @@
+table 'Calendar Lookup'
+	excludeFromModelRefresh
+	lineageTag: 72330ed0-7bd0-4220-809b-b06970905aed
+
+	/// Total profit calculated over the last 90 days from the current date.
+	measure '90-day Rolling Profit' =
+			
+			C
+		lineageTag: eaba47e4-6504-424e-970f-ee6e5af4049d
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		lineageTag: 64a92e3c-277f-477a-9d4f-8f39f11ded21
+		summarizeBy: none
+		sourceColumn: Date
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Day Name'
+		dataType: string
+		lineageTag: 639c6036-9205-4cd6-96dd-43a200c57e92
+		summarizeBy: none
+		sourceColumn: Day Name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Start of Week'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 10628bd8-5d3f-4a55-bf3f-27cffffe912f
+		summarizeBy: none
+		sourceColumn: Start of Week
+
+		changedProperty = IsHidden
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Start of Month'
+		dataType: dateTime
+		formatString: mmmm yyyy
+		lineageTag: c7187c48-5f31-424c-aafe-3ac602bce4e2
+		summarizeBy: none
+		sourceColumn: Start of Month
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation PBI_FormatHint = {"isDateTimeCustom":true}
+
+	column 'Start of Quarter'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 664eecb8-559c-475b-b08c-81b559f46e86
+		summarizeBy: none
+		sourceColumn: Start of Quarter
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Month Name'
+		dataType: string
+		lineageTag: 992cbd41-067d-41d2-80ef-d3bbe1e0834b
+		summarizeBy: none
+		sourceColumn: Month Name
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: int64
+		formatString: 0
+		lineageTag: ced22d83-4f40-4233-ae9c-afd0522a9e4e
+		summarizeBy: sum
+		sourceColumn: Month
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Start of Year'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 20bd71aa-8167-4a84-945c-99850a146df7
+		summarizeBy: none
+		sourceColumn: Start of Year
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 041326a6-147d-4ba7-8fc3-a2e8c6c02d94
+		summarizeBy: sum
+		sourceColumn: Year
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month Short' =
+			
+			UPPER(LEFT(
+			    'Calendar Lookup'[Month Name],
+			    3
+			))
+		lineageTag: 58d7dc63-151f-42f3-9aa2-c96327a76be5
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of week' =
+			
+			WEEKDAY('Calendar Lookup'[Date],
+			2
+			)
+		formatString: 0
+		lineageTag: 2c2c4218-5664-4169-b3df-4cee14382436
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weekend =
+			
+			IF('Calendar Lookup'[Day of week] IN {6,7},
+			    "weekend",
+			    "weekday"
+			)
+		lineageTag: 68580f7c-9cdb-4998-97f5-f4b13ddef05e
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'End of Month'
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: a38323b4-88bb-4710-8832-8c5f1855cde6
+		summarizeBy: none
+		sourceColumn: End of Month
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	hierarchy 'Date Hierarchy'
+		lineageTag: a0271ac4-6052-4c74-b458-d9149729ab33
+
+		level 'Start of Year'
+			lineageTag: 96cc97ec-8955-4855-ba76-eaf154b772f3
+			column: 'Start of Year'
+
+		level 'Start of Month'
+			lineageTag: 849ea10b-e8e2-4b7f-b65f-2e4bd46d5c4a
+			column: 'Start of Month'
+
+		level 'Start of Week'
+			lineageTag: bd1d486e-8d84-4ae0-b375-a635ee98fef9
+			column: 'Start of Week'
+
+		level Date
+			lineageTag: b41fb032-a98a-4a8a-8b47-ca878dade2ef
+			column: Date
+
+		changedProperty = IsHidden
+
+	partition 'Calendar Lookup' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Calendar Lookup.csv"),[Delimiter=",", Columns=1, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Date", type date}}),
+				    #"Inserted Day Name" = Table.AddColumn(#"Changed Type", "Day Name", each Date.DayOfWeekName([Date]), type text),
+				    #"Inserted Start of Week" = Table.AddColumn(#"Inserted Day Name", "Start of Week", each Date.StartOfWeek([Date],Day.Monday)),
+				    #"Inserted Start of Month" = Table.AddColumn(#"Inserted Start of Week", "Start of Month", each Date.StartOfMonth([Date]), type date),
+				    #"Inserted Start of Quarter" = Table.AddColumn(#"Inserted Start of Month", "Start of Quarter", each Date.StartOfQuarter([Date]), type date),
+				    #"Inserted Month Name" = Table.AddColumn(#"Inserted Start of Quarter", "Month Name", each Date.MonthName([Date]), type text),
+				    #"Inserted Month" = Table.AddColumn(#"Inserted Month Name", "Month", each Date.Month([Date]), Int64.Type),
+				    #"Inserted Start of Year" = Table.AddColumn(#"Inserted Month", "Start of Year", each Date.StartOfYear([Date]), type date),
+				    #"Inserted Year" = Table.AddColumn(#"Inserted Start of Year", "Year", each Date.Year([Date]), Int64.Type),
+				    #"Inserted End of Month" = Table.AddColumn(#"Inserted Year", "End of Month", each Date.EndOfMonth([Date]), type date),
+				    #"Filtered Rows" = Table.SelectRows(#"Inserted End of Month", each true)
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

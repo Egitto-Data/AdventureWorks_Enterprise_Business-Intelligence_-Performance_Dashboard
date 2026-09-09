@@ -1,0 +1,71 @@
+createOrReplace
+
+	expression Parameter1 = #"Sample File" meta [IsParameterQuery=true, BinaryIdentifier=#"Sample File", Type="Binary", IsParameterQueryRequired=true]
+		lineageTag: 7c23c0d1-f084-40c1-a4ef-1d008bf11274
+		queryGroup: 'Transform File from Sales Data\Helper Queries'
+
+		annotation PBI_ResultType = Binary
+
+		annotation PBI_NavigationStepName = Navigation
+
+	expression 'Sample File' =
+			let
+			    Source = Folder.Files("G:\All_My_Projects\PowerBiProject\Sales Data"),
+			    Navigation1 = Source{0}[Content]
+			in
+			    Navigation1
+		lineageTag: a04ba672-f1f7-48f7-9748-ff056f0ad28a
+		queryGroup: 'Transform File from Sales Data\Helper Queries'
+
+		annotation PBI_ResultType = Binary
+
+	expression 'Transform Sample File' =
+			let
+			    Source = Csv.Document(Parameter1,[Delimiter=",", Columns=8, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    #"Promoted Headers"
+		lineageTag: 4467e7ac-6a88-4170-8dd5-b7791d4f80fe
+		queryGroup: 'Transform File from Sales Data'
+
+		annotation PBI_ResultType = Table
+
+	expression 'Transform File' =
+			let
+			    Source = (Parameter1 as binary) => let
+			    Source = Csv.Document(Parameter1,[Delimiter=",", Columns=8, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+			    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true])
+			in
+			    #"Promoted Headers"
+			in
+			    Source
+		mAttributes: [ FunctionQueryBinding = "{""exemplarFormulaName"":""Transform Sample File""}" ]
+		lineageTag: 092d07d7-9e73-4ea5-8077-7139875a82be
+		queryGroup: 'Transform File from Sales Data\Helper Queries'
+
+		annotation PBI_ResultType = Function
+
+	expression 'Rolling Calendar' =
+			let
+			    Source = #date(2023,1,1),
+			    Custom1 = List.Dates(
+			  Source,
+			  Number.From(DateTime.LocalNow()) - Number.From(Source),
+			  #duration(1,0,0,0)
+			),
+			    #"Converted to Table" = Table.FromList(Custom1, Splitter.SplitByNothing(), null, null, ExtraValues.Error),
+			    #"Changed Type" = Table.TransformColumnTypes(#"Converted to Table",{{"Column1", type date}}),
+			    #"Sorted Rows" = Table.Sort(#"Changed Type",{{"Column1", Order.Descending}}),
+			    #"Renamed Columns" = Table.RenameColumns(#"Sorted Rows",{{"Column1", "Date"}}),
+			    #"Inserted Year" = Table.AddColumn(#"Renamed Columns", "Year", each Date.Year([Date]), Int64.Type),
+			    #"Inserted Start of Quarter" = Table.AddColumn(#"Inserted Year", "Start of Quarter", each Date.StartOfQuarter([Date]), type date),
+			    #"Inserted Start of Month" = Table.AddColumn(#"Inserted Start of Quarter", "Start of Month", each Date.StartOfMonth([Date]), type date),
+			    #"Changed Type1" = Table.TransformColumnTypes(#"Inserted Start of Month",{{"Year", type date}})
+			in
+			    #"Changed Type1"
+		lineageTag: ae46509d-2752-4bd1-aea2-14c55eb87ffb
+
+		annotation PBI_NavigationStepName = Navigation
+
+		annotation PBI_ResultType = Table
+

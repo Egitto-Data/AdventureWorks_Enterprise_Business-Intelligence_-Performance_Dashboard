@@ -1,0 +1,87 @@
+table 'Data Dictionary'
+	lineageTag: f05849b5-8fe2-4516-8652-a04a0f3579c2
+
+	column Type
+		lineageTag: ce44add5-4c5e-4484-a958-02d9456b6615
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Type]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		lineageTag: 0984701d-d170-4f56-a8f9-ce7ab0ebba76
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Name]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Location
+		lineageTag: dbebe629-bfe7-432e-b36e-59fc9a5d7143
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Location]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Expression
+		lineageTag: 0ec47306-cd65-4853-b2db-61ef592c68c0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Expression]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Data Dictionary' = calculated
+		mode: import
+		source =
+				
+				VAR _columns = SELECTCOLUMNS(
+				FILTER(
+				INFO.VIEW.COLUMNS()
+				,[Table] <> "Data Dictionary" && NOT([IsHidden])
+				)
+				, "Type", "Column"
+				,"Name", [Name]
+				
+				, "Location", [Table]
+				, "Expression", [Expression]
+				)
+				VAR _measures = SELECTCOLUMNS(
+				FILTER(
+				INFO.VIEW.MEASURES()
+				, [Table] <> "Data Dictionary" && NOT([IsHidden])
+				)
+				, "Type", "Measure"
+				, "Name", [Name]
+				
+				, "Location", [Table]
+				, "Expression", [Expression]
+				)
+				VAR _tables = SELECTCOLUMNS(
+				FILTER(
+				INFO.VIEW.TABLES()
+				, [Name] <> "Data Dictionary" && [Name] <> "Calculations" && NOT([IsHidden])
+				)
+				, "Type", "Table"
+				,"Name", [Name]
+				
+				,"Location", BLANK()
+				,"Expression", [Expression]
+				)
+				
+				VAR _relationships = SELECTCOLUMNS(
+				INFO.VIEW.RELATIONSHIPS()
+				, "Type", "Relationship"
+				,"Name", [Relationship]
+				
+				,"Location", Blank()
+				,"Expression", [Relationship]
+				)
+				
+				RETURN
+				UNION(_columns,_measures,_tables,_relationships)
+
+	annotation PBI_Id = 8d5b5008f6b54a179a6d5e2ac713ed75
+

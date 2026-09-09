@@ -1,0 +1,79 @@
+table 'Territory Lookup'
+	excludeFromModelRefresh
+	lineageTag: 59ab0e9e-61fb-42b6-bda9-6e7cde5b9858
+
+	column SalesTerritoryKey
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: e484cb94-57a3-40f2-b02c-4d2321875363
+		summarizeBy: none
+		sourceColumn: SalesTerritoryKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 1514ba74-b358-4257-92bc-49a7a2a4a27d
+		summarizeBy: none
+		sourceColumn: Region
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Country
+		dataType: string
+		lineageTag: 87037204-111e-41cd-b087-a28bcb589364
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column Continent
+		dataType: string
+		lineageTag: 37093439-16ad-42f4-950b-067f78f2192b
+		dataCategory: Continent
+		summarizeBy: none
+		sourceColumn: Continent
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Territory Hierarchy'
+		lineageTag: 7176c021-114c-4569-8c2a-5490bfdb9dfb
+
+		level Continent
+			lineageTag: 081ca03e-7db3-4772-8f90-991f2528da40
+			column: Continent
+
+		level Country
+			lineageTag: 2e335705-4b70-442d-a7c5-d2e9f73bd61d
+			column: Country
+
+		level Region
+			lineageTag: 4d235165-faec-485b-8ac8-a08b7a2a711c
+			column: Region
+
+		changedProperty = IsHidden
+
+	partition 'Territory Lookup' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Territory Lookup.csv"),[Delimiter=",", Columns=4, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"SalesTerritoryKey", Int64.Type}, {"Region", type text}, {"Country", type text}, {"Continent", type text}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

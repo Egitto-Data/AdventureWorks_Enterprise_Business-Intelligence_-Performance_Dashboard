@@ -1,0 +1,169 @@
+table 'Product Lookup'
+	excludeFromModelRefresh
+	lineageTag: b4b820e2-d13f-4117-82c6-0a1b8ffb9caa
+
+	column ProductKey
+		dataType: int64
+		isKey
+		formatString: 0
+		lineageTag: 1e327a65-3739-47df-b43d-811927308bb6
+		summarizeBy: none
+		sourceColumn: ProductKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductSubcategoryKey
+		dataType: int64
+		formatString: 0
+		lineageTag: 1e5d9e0d-f455-4873-af3e-87b4c763a54c
+		summarizeBy: none
+		sourceColumn: ProductSubcategoryKey
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductSKU
+		dataType: string
+		lineageTag: 028c1b01-e3dd-4565-9d9c-7aab115827d4
+		summarizeBy: none
+		sourceColumn: ProductSKU
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductName
+		dataType: string
+		lineageTag: 8af9fcba-c47e-4245-b796-5e249bb943e1
+		summarizeBy: none
+		sourceColumn: ProductName
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ModelName
+		dataType: string
+		lineageTag: 0d125f2b-d666-4a0f-9f61-0a6c975fffc6
+		summarizeBy: none
+		sourceColumn: ModelName
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductDescription
+		dataType: string
+		lineageTag: ef2d1bac-ad14-4224-a7ad-1e0d27436730
+		summarizeBy: none
+		sourceColumn: ProductDescription
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductColor
+		dataType: string
+		lineageTag: b8e6dddf-8eed-404d-8a66-d31a6ac20c40
+		summarizeBy: none
+		sourceColumn: ProductColor
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductStyle
+		dataType: string
+		lineageTag: c8b5a32b-4482-4ff8-a9ec-b9ba5a8f5c56
+		summarizeBy: none
+		sourceColumn: ProductStyle
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductCost
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: d90e3c2a-653e-486a-a56b-151225b78949
+		summarizeBy: sum
+		sourceColumn: ProductCost
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column ProductPrice
+		dataType: decimal
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		lineageTag: f50e6582-fbd4-4c08-8964-b13e68b775eb
+		summarizeBy: sum
+		sourceColumn: ProductPrice
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column 'SKU Type'
+		dataType: string
+		lineageTag: d57072fa-d8c0-4ac4-8129-b1a3e40935a6
+		summarizeBy: none
+		sourceColumn: SKU Type
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Price Points' =
+			
+			SWITCH(
+			    TRUE(),
+			    'Product Lookup'[ProductPrice] > 500 ,"High",
+			    'Product Lookup'[ProductPrice] > 100 ,"Mid-Range",
+			    "Low"
+			    )
+		lineageTag: 0f0dd47c-ad29-4903-ae36-3f3e1f6e8fd7
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SKU Category' =
+			
+			LEFT('Product Lookup'[ProductSKU],
+			    SEARCH(
+			        "-",
+			        'Product Lookup'[ProductSKU],
+			    )
+			    -1
+			)
+		lineageTag: 97dd9beb-7c35-4228-bfd9-d5f12270aa26
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Product Lookup' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents("G:\All_My_Projects\PowerBiProject\AdventureWorks Product Lookup.csv"),[Delimiter=",", Columns=11, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+				    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+				    #"Changed To Currency" = Table.TransformColumnTypes(#"Promoted Headers",{{"ProductPrice", Currency.Type}, {"ProductCost", Currency.Type}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed To Currency",{"ProductSize"}),
+				    #"Inserted Text Before Delimiter" = Table.AddColumn(#"Removed Columns", "Text Before Delimiter", each Text.BeforeDelimiter([ProductSKU], "-", 1), type text),
+				    #"Replaced Value" = Table.ReplaceValue(#"Inserted Text Before Delimiter","0","NA",Replacer.ReplaceText,{"ProductStyle"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Replaced Value",{{"Text Before Delimiter", "SKU Type"}}),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Renamed Columns",{{"ProductKey", Int64.Type}, {"ProductSubcategoryKey", Int64.Type}})
+				in
+				    #"Changed Type"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

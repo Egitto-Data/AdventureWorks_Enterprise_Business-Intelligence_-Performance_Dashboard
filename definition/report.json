@@ -1,0 +1,149 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/3.0.0/schema.json",
+  "themeCollection": {
+    "baseTheme": {
+      "name": "CY24SU10",
+      "reportVersionAtImport": {
+        "visual": "1.8.95",
+        "report": "2.0.95",
+        "page": "1.3.95"
+      },
+      "type": "SharedResources"
+    }
+  },
+  "objects": {
+    "section": [
+      {
+        "properties": {
+          "verticalAlignment": {
+            "expr": {
+              "Literal": {
+                "Value": "'Top'"
+              }
+            }
+          }
+        }
+      }
+    ],
+    "outspacePane": [
+      {
+        "properties": {
+          "expanded": {
+            "expr": {
+              "Literal": {
+                "Value": "false"
+              }
+            }
+          }
+        }
+      }
+    ]
+  },
+  "publicCustomVisuals": [
+    "htmlContent443BE3AD55E043BF878BED274D3A6855",
+    "RaceBarChart828E7F9A76D539488CE6C92657D234CF"
+  ],
+  "resourcePackages": [
+    {
+      "name": "SharedResources",
+      "type": "SharedResources",
+      "items": [
+        {
+          "name": "CY24SU10",
+          "path": "BaseThemes/CY24SU10.json",
+          "type": "BaseTheme"
+        }
+      ]
+    },
+    {
+      "name": "RegisteredResources",
+      "type": "RegisteredResources",
+      "items": [
+        {
+          "name": "icons8-chart-100267809140165987.png",
+          "path": "icons8-chart-100267809140165987.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-box-1289619511566899575.png",
+          "path": "icons8-box-1289619511566899575.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-return-1009215264629115213.png",
+          "path": "icons8-return-1009215264629115213.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-money-10044180202079425457.png",
+          "path": "icons8-money-10044180202079425457.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-dashboard-1008185555040100808.png",
+          "path": "icons8-dashboard-1008185555040100808.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-dashboard-100205847497323292117.png",
+          "path": "icons8-dashboard-100205847497323292117.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-map-10021315160554192214.png",
+          "path": "icons8-map-10021315160554192214.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-map-100BLUE19749580980707926.png",
+          "path": "icons8-map-100BLUE19749580980707926.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-customer-skin-type-7-106253293698961763.png",
+          "path": "icons8-customer-skin-type-7-106253293698961763.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-customer-skin-type-7-10829718943897778.png",
+          "path": "icons8-customer-skin-type-7-10829718943897778.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-box-10020363984511778954.png",
+          "path": "icons8-box-10020363984511778954.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-box-1009271046915368237.png",
+          "path": "icons8-box-1009271046915368237.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-filter-1006453409183318369.png",
+          "path": "icons8-filter-1006453409183318369.png",
+          "type": "Image"
+        },
+        {
+          "name": "icons8-filter-1008700279748952444.png",
+          "path": "icons8-filter-1008700279748952444.png",
+          "type": "Image"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "useStylableVisualContainerHeader": true,
+    "exportDataMode": "AllowSummarized",
+    "defaultDrillFilterOtherVisuals": true,
+    "allowChangeFilterTypes": true,
+    "useEnhancedTooltips": true,
+    "useDefaultAggregateDisplayName": true
+  },
+  "slowDataSourceSettings": {
+    "isCrossHighlightingDisabled": false,
+    "isSlicerSelectionsButtonEnabled": false,
+    "isFilterSelectionsButtonEnabled": false,
+    "isApplyAllButtonEnabled": false
+  }
+}
